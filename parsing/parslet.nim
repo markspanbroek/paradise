@@ -1,5 +1,5 @@
-type Parslet* = object
+type Parslet* = object of RootObj
   description*: string
 
-func `$`*(parslet: Parslet): string =
+func `$`*[P: Parslet](parslet: P): string =
   parslet.description

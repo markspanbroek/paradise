@@ -2,5 +2,8 @@ import ./parslet
 
 export parslet.`$`
 
-func symbol*(symbol: char): auto =
-  Parslet(description: "'" & symbol & "'")
+type Symbol* = object of Parslet
+  character*: char
+
+func symbol*(character: char): auto =
+  Symbol(character: character, description: "'" & character & "'")
