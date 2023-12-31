@@ -2,13 +2,18 @@ import ./basics
 import ./parslet
 import ./grammar
 import ./input
+import ./characters
 
-proc parse*(symbol: Symbol, input: Input): ?!char =
-  let character = ? input.read()
-  if symbol.character == character:
-    success character
+proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input[Token]): ?!Token =
+  mixin category
+  let token = ? input.read()
+  if token.category == symbol.category:
+    success token
   else:
-    char.failure "expected: '" & symbol.character & "'"
+    Token.failure "expected: " & $symbol.category
 
-proc parse*[P: Parslet](parslet: P, input: string): auto =
+proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
+  parslet.parse(Input.new(input))
+
+proc parse*[P: Parslet[char]](parslet: P, input: string): auto =
   parslet.parse(Input.new(input))

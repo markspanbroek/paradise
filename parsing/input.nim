@@ -1,18 +1,22 @@
 import ./basics
+import ./characters
 
-type Input* = ref object
-  read*: proc: ?!char
+type Input*[Token] = ref object
+  read*: proc: ?!Token
 
-func new*(_: type Input, input: string): Input =
+func new*[Token](_: type Input, input: seq[Token]): Input[Token] =
+  mixin endOfInput
   var index = 0
-  proc read: ?!char =
+  proc read: ?!Token =
     if index < input.len:
       result = success input[index]
       inc index
     elif index == input.len:
-      result = success '\0'
+      result = success Token.endOfInput
       inc index
     else:
-      result = failure "reading beyond end of string"
+      result = failure "reading beyond end of input"
+  Input[Token](read: read)
 
-  Input(read: read)
+func new*(_: type Input, input: string): Input[char] =
+  Input.new(cast[seq[char]](input))

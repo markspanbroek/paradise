@@ -2,8 +2,11 @@ import ./parslet
 
 export parslet.`$`
 
-type Symbol* = object of Parslet
-  character*: char
+type Symbol*[Token, Category] = object of Parslet[Token]
+  category*: Category
+
+func symbol*[Category](Token: type, category: Category): auto =
+  Symbol[Token, Category](category: category, description: $category)
 
 func symbol*(character: char): auto =
-  Symbol(character: character, description: "'" & character & "'")
+  Symbol[char, char](category: character, description: "'" & character & "'")
