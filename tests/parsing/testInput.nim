@@ -1,4 +1,5 @@
 import std/unittest
+import std/strutils
 import parsing/basics
 import parsing/input
 import ./examples/lexer
@@ -21,7 +22,18 @@ suite "string input":
     check input.read() == success '\0'
     let failure = input.read()
     check failure.isFailure
-    check failure.error.msg == "reading beyond end of input"
+    check failure.error.msg.contains("reading beyond end of input")
+
+  test "errors include line and column location":
+    proc readUntilError(input: string): ref CatchableError =
+      let input = Input.new(input)
+      var outcome = input.read()
+      while outcome.isSuccess:
+        outcome = input.read()
+      outcome.error
+    check readUntilError("").msg.contains("(1, 1)")
+    check readUntilError("abc").msg.contains("(1, 4)")
+    check readUntilError("a\nb\nc").msg.contains("(3, 2)")
 
 suite "token sequence input":
 
@@ -46,4 +58,15 @@ suite "token sequence input":
     check input.read() == success LexerToken.endOfInput
     let failure = input.read()
     check failure.isFailure
-    check failure.error.msg == "reading beyond end of input"
+    check failure.error.msg.contains("reading beyond end of input")
+
+  test "errors include sequence index":
+    proc readUntilError(input: seq[LexerToken]): ref CatchableError =
+      let input = Input.new(input)
+      var outcome = input.read()
+      while outcome.isSuccess:
+        outcome = input.read()
+      outcome.error
+    check readUntilError(@[]).msg.contains("(0)")
+    check readUntilError(@[token1, token2]).msg.contains("(2)")
+    check readUntilError(@[token1, token2, tokenA]).msg.contains("(3)")
