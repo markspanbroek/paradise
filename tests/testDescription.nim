@@ -12,3 +12,7 @@ suite "grammar descriptions":
   test "token symbol":
     check $symbol(LexerToken, LexerCategory.text) == "text"
     check $symbol(LexerToken, LexerCategory.number) == "number"
+
+  test "end of input":
+    check $finish() == "'\0'"
+    check $finish(LexerToken) == "endOfInput"

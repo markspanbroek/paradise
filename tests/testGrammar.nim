@@ -9,6 +9,9 @@ suite "character grammars":
     check symbol('a') is Parslet[char]
     check symbol('!') is Parslet[char]
 
+  test "end of input":
+    check finish() is Parslet[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -17,3 +20,6 @@ suite "token grammars":
   test "symbols":
     check number is Parslet[LexerToken]
     check text is Parslet[LexerToken]
+
+  test "end of input":
+    check finish(LexerToken) is Parslet[LexerToken]

@@ -12,6 +12,10 @@ suite "parse characters":
     check symbol('a').parse("b").isFailure
     check symbol('b').parse("a").isFailure
 
+  test "end of input":
+    check finish().parse("") == success '\0'
+    check finish().parse("a").isFailure
+
 suite "parse tokens":
 
   let token1 = LexerToken(category: number, value: "1")
@@ -27,3 +31,8 @@ suite "parse tokens":
     check text.parse(@[token1]).isFailure
     check text.parse(@[token2]).isFailure
     check text.parse(@[tokenA]) == success tokenA
+
+  test "end of input":
+    let endToken = LexerToken(category: endOfInput)
+    check finish(LexerToken).parse(@[]) == success endToken
+    check finish(LexerToken).parse(@[token1]).isFailure
