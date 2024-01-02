@@ -2,6 +2,7 @@ import std/unittest
 import parsing/grammar
 import parsing/parslet
 import ./examples/lexer
+import ./examples/conversion
 
 suite "character grammars":
 
@@ -15,6 +16,9 @@ suite "character grammars":
 
   test "end of input":
     check finish() is Parslet[char]
+
+  test "conversion":
+    check symbol({'0'..'9'}).convert(charToInt) is Parslet[char]
 
 suite "token grammars":
 
@@ -30,3 +34,6 @@ suite "token grammars":
 
   test "end of input":
     check finish(LexerToken) is Parslet[LexerToken]
+
+  test "conversion":
+    check number.convert(tokenToString) is Parslet[LexerToken]

@@ -5,6 +5,7 @@ import parsing/grammar
 import parsing/parser
 import parsing/input
 import ./examples/lexer
+import ./examples/conversion
 
 suite "parse characters":
 
@@ -21,6 +22,10 @@ suite "parse characters":
   test "end of input":
     check finish().parse("") == success '\0'
     check finish().parse("a").isFailure
+
+  test "conversion":
+    check symbol({'0'..'9'}).convert(charToInt).parse("5") == success 5
+    check symbol({'0'..'9'}).convert(charToInt).parse("a").isFailure
 
   test "errors include line and column location":
     let parser = symbol('o')
@@ -56,6 +61,13 @@ suite "parse tokens":
     let endToken = LexerToken(category: endOfInput)
     check finish(LexerToken).parse(@[]) == success endToken
     check finish(LexerToken).parse(@[token1]).isFailure
+
+  test "conversion":
+    let text = symbol(LexerToken, LexerCategory.text).convert(tokenToString)
+    let tokenAbc = LexerToken(category: text, value: "abc")
+    let token123 = LexerToken(category: number, value: "123")
+    check text.parse(@[tokenAbc]) == success "abc"
+    check text.parse(@[token123]).isFailure
 
   test "errors include sequence index":
     let parser = symbol(LexerToken, LexerCategory.number)

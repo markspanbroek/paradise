@@ -13,6 +13,9 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
   else:
     Token.failure "expected: " & $symbol & " " & $location
 
+proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
+  success conversion.convert(? conversion.operand.parse(input))
+
 proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
   parslet.parse(Input.new(input))
 

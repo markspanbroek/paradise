@@ -21,3 +21,12 @@ func symbol*(characters: char | set[char]): auto =
 func finish*(Token: type = char): auto =
   mixin category, endOfInput
   symbol(Token, Token.endOfInput.category)
+
+type
+  Conversion*[Token, Operand, From, To] = object of Parslet[Token]
+    operand*: Operand
+    convert*: Converter[From, To]
+  Converter[From, To] = proc(input: From): To {.noSideEffect.}
+
+func convert*[Token; P: Parslet[Token], From, To](parslet: P, convert: Converter[From, To]): auto =
+  Conversion[Token, P, From, To](operand: parslet, convert: convert, description: parslet.description)

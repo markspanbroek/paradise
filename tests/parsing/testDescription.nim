@@ -1,6 +1,7 @@
 import std/unittest
 import parsing/grammar
 import ./examples/lexer
+import ./examples/conversion
 
 suite "grammar descriptions":
 
@@ -22,3 +23,7 @@ suite "grammar descriptions":
   test "end of input":
     check $finish() == "'\0'"
     check $finish(LexerToken) == "endOfInput"
+
+  test "conversion":
+    check $symbol('5').convert(charToInt) == "'5'"
+    check $symbol({'1'..'5'}).convert(charToInt) == "{'1', '2', '3', '4', '5'}"
