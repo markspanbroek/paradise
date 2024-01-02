@@ -2,27 +2,30 @@ import ./basics
 import ./characters
 import ./location
 
-type Input*[Token] = ref object
-  read*: proc: ?!Token
+export location.`$`
 
-func new[Token](_: type Input, Location: type, input: seq[Token]): Input[Token] =
+type Input*[Token, Location] = ref object
+  read*: proc: ?!Token
+  location*: Location
+
+func new[Token](_: type Input, Location: type, tokens: seq[Token]): auto =
   mixin endOfInput
+  var input = Input[Token, Location](location: Location.init())
   var index = 0
-  var location = Location.init()
-  proc read: ?!Token =
-    if index < input.len:
-      location.update(input[index])
-      result = success input[index]
+  input.read = proc: ?!Token =
+    if index < tokens.len:
+      input.location.update(tokens[index])
+      result = success tokens[index]
       inc index
-    elif index == input.len:
+    elif index == tokens.len:
       result = success Token.endOfInput
       inc index
     else:
-      result = failure "reading beyond end of input " & $location
-  Input[Token](read: read)
+      result = failure "reading beyond end of input " & $input.location
+  input
 
-func new*[Token](_: type Input, input: seq[Token]): Input[Token] =
+func new*[Token](_: type Input, input: seq[Token]): auto =
   Input.new(SequenceLocation, input)
 
-func new*(_: type Input, input: string): Input[char] =
+func new*(_: type Input, input: string): auto =
   Input.new(TextLocation, cast[seq[char]](input))
