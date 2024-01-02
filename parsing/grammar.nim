@@ -7,11 +7,10 @@ type Symbol*[Token, Category] = object of Parslet[Token]
   category*: Category
 
 func symbol*[Category](Token: type, category: Category): auto =
-  when Category is char:
-    let description = "'" & category & "'"
-  else:
-    let description = $category
-  Symbol[Token, Category](category: category, description: description)
+  Symbol[Token, Category](category: category, description: $category)
+
+func symbol*(Token: type, category: char): auto =
+  Symbol[Token, char](category: category, description: "'" & category & "'")
 
 func symbol*(character: char): auto =
   symbol(char, character)
