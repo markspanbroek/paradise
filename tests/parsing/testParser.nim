@@ -14,6 +14,10 @@ suite "parse characters":
     check symbol('a').parse("b").isFailure
     check symbol('b').parse("a").isFailure
 
+  test "character sets":
+    check symbol({'a'..'z'}).parse("k") == success 'k'
+    check symbol({'a'..'z'}).parse("5").isFailure
+
   test "end of input":
     check finish().parse("") == success '\0'
     check finish().parse("a").isFailure
@@ -41,6 +45,12 @@ suite "parse tokens":
     check text.parse(@[token1]).isFailure
     check text.parse(@[token2]).isFailure
     check text.parse(@[tokenA]) == success tokenA
+
+  test "symbol sets":
+    let numberOrText = symbol(LexerToken, {LexerCategory.number, text})
+    check numberOrText.parse(@[token1]) == success token1
+    check numberOrText.parse(@[token2]) == success token2
+    check numberOrText.parse(@[tokenA]) == success tokenA
 
   test "end of input":
     let endToken = LexerToken(category: endOfInput)

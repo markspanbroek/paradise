@@ -8,10 +8,10 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
   mixin category
   let location = input.location
   let token = ? input.read()
-  if token.category == symbol.category:
+  if token.category in symbol.categories:
     success token
   else:
-    Token.failure "expected: " & $symbol.category & " " & $location
+    Token.failure "expected: " & $symbol & " " & $location
 
 proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
   parslet.parse(Input.new(input))
