@@ -7,6 +7,7 @@ export location.`$`
 type Input*[Token, Location] = ref object
   read*: proc: ?!Token
   location*: Location
+  atEnd*: bool
 
 func new[Token](_: type Input, Location: type, tokens: seq[Token]): auto =
   mixin endOfInput
@@ -22,6 +23,8 @@ func new[Token](_: type Input, Location: type, tokens: seq[Token]): auto =
       inc index
     else:
       result = failure "reading beyond end of input " & $input.location
+    if index >= tokens.len:
+      input.atEnd = true
   input
 
 func new*[Token](_: type Input, input: seq[Token]): auto =

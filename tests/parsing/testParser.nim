@@ -1,5 +1,6 @@
 import std/unittest
 import std/strutils
+import std/sequtils
 import pkg/questionable/results
 import parsing
 import parsing/input
@@ -25,6 +26,19 @@ suite "parse characters":
   test "conversion":
     check symbol({'0'..'9'}).convert(charToInt).parse("5") == success 5
     check symbol({'0'..'9'}).convert(charToInt).parse("a").isFailure
+
+  test "iterative parsing":
+    let parser = symbol({'0'..'9'}).convert(charToInt)
+    let parsed = toSeq(parser.parse("123"))
+    check parsed == @[success 1, success 2, success 3]
+
+  test "iterative parsing stops on error":
+    let parser = symbol({'0'..'9'}).convert(charToInt)
+    let parsed = toSeq(parser.parse("12x3"))
+    check parsed.len == 3
+    check parsed[0] == success 1
+    check parsed[1] == success 2
+    check parsed[2].isFailure
 
   test "errors include line and column location":
     let parser = symbol('o')
@@ -67,6 +81,20 @@ suite "parse tokens":
     let token123 = LexerToken(category: number, value: "123")
     check text.parse(@[tokenAbc]) == success "abc"
     check text.parse(@[token123]).isFailure
+
+  test "iterative parsing":
+    let number = symbol(LexerToken, {LexerCategory.number})
+    let parser = number.convert(tokenToString)
+    let parsed = toSeq(parser.parse(@[token1, token2]))
+    check parsed == @[success "1", success "2"]
+
+  test "iterative parsing stops on error":
+    let number = symbol(LexerToken, {LexerCategory.number})
+    let parser = number.convert(tokenToString)
+    let parsed = toSeq(parser.parse(@[token1, tokenA, token2]))
+    check parsed.len == 2
+    check parsed[0] == success "1"
+    check parsed[1].isFailure
 
   test "errors include sequence index":
     let parser = symbol(LexerToken, LexerCategory.number)
