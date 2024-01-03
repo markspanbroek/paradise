@@ -1,8 +1,7 @@
 import std/unittest
 import std/strutils
-import parsing/basics
-import parsing/grammar
-import parsing/parser
+import pkg/questionable/results
+import parsing
 import parsing/input
 import ./examples/lexer
 import ./examples/conversion
