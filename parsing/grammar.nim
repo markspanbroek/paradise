@@ -1,8 +1,10 @@
 import ./characters
 
-type Parslet*[Token] = object of RootObj
+type Parslet*[Token] = concept parslet, type P
+  P.Token is Token
+  $parslet is string
 
-type Symbol*[Token, Category] = object of Parslet[Token]
+type Symbol*[Token, Category] = object
   categories*: set[Category]
   description*: string
 
@@ -26,7 +28,7 @@ func finish*(Token: type = char): auto =
   symbol(Token, Token.endOfInput.category)
 
 type
-  Conversion*[Token, Operand, From, To] = object of Parslet[Token]
+  Conversion*[Token, Operand, From, To] = object
     operand*: Operand
     convert*: Converter[From, To]
   Converter[From, To] = proc(input: From): To {.noSideEffect.}

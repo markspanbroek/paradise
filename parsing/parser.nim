@@ -15,25 +15,25 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
 proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
   success conversion.convert(? conversion.operand.parse(input))
 
-proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
+proc parse*[Token](parslet: Parslet[Token], input: seq[Token]): auto =
   parslet.parse(Input.new(input))
 
-proc parse*[P: Parslet[char]](parslet: P, input: string): auto =
+proc parse*(parslet: Parslet[char], input: string): auto =
   parslet.parse(Input.new(input))
 
-iterator parse*[Token; P: Parslet[Token]](parslet: P, input: Input): auto =
+iterator parse*[Token](parslet: Parslet[Token], input: Input[Token]): auto =
   var failure = false
   while not input.ended() and not failure:
     let parsed = parslet.parse(input)
     failure = parsed.isFailure
     yield parsed
 
-iterator parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
+iterator parse*[Token](parslet: Parslet[Token], input: seq[Token]): auto =
   let input = Input.new(input)
   for parsed in parslet.parse(input):
     yield parsed
 
-iterator parse*[P: Parslet[char]](parslet: P, input: string): auto =
+iterator parse*(parslet: Parslet[char], input: string): auto =
   let input = Input.new(input)
   for parsed in parslet.parse(input):
     yield parsed
