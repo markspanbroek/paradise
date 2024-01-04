@@ -3,7 +3,7 @@ import ./grammar
 import ./input
 import ./characters
 
-proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!Token =
+proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input[Token]): ?!Token =
   mixin category
   let location = input.location
   let token = ? input.read()
@@ -12,8 +12,8 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
   else:
     Token.failure "expected: " & $symbol & " " & location
 
-proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
-  success conversion.convert(? conversion.operand.parse(input))
+proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input[Token]): ?!To =
+  conversion.operand.parse(input).map(conversion.convert)
 
 proc parse*[Token](parslet: Parslet[Token], input: seq[Token]): auto =
   parslet.parse(Input.new(input))
