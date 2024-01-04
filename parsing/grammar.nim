@@ -1,10 +1,13 @@
-import ./parslet
 import ./characters
 
-export parslet.`$`
+type Parslet*[Token] = object of RootObj
 
 type Symbol*[Token, Category] = object of Parslet[Token]
   categories*: set[Category]
+  description*: string
+
+func `$`*(symbol: Symbol): string =
+  symbol.description
 
 func symbol*[Category](Token: type, categories: set[Category]): auto =
   Symbol[Token, Category](categories: categories, description: $categories)
@@ -28,5 +31,8 @@ type
     convert*: Converter[From, To]
   Converter[From, To] = proc(input: From): To {.noSideEffect.}
 
+func `$`*(conversion: Conversion): string =
+  $conversion.operand
+
 func convert*[Token; P: Parslet[Token], From, To](parslet: P, convert: Converter[From, To]): auto =
-  Conversion[Token, P, From, To](operand: parslet, convert: convert, description: parslet.description)
+  Conversion[Token, P, From, To](operand: parslet, convert: convert)

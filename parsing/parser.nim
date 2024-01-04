@@ -1,5 +1,4 @@
 import ./basics
-import ./parslet
 import ./grammar
 import ./input
 import ./characters
