@@ -29,12 +29,12 @@ suite "parse characters":
 
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
-    let parsed = toSeq(parser.parse("123"))
+    let parsed = toSeq(parser.tokenize("123"))
     check parsed == @[success 1, success 2, success 3]
 
   test "iterative parsing stops on error":
     let parser = symbol({'0'..'9'}).convert(charToInt)
-    let parsed = toSeq(parser.parse("12x3"))
+    let parsed = toSeq(parser.tokenize("12x3"))
     check parsed.len == 3
     check parsed[0] == success 1
     check parsed[1] == success 2
@@ -85,13 +85,13 @@ suite "parse tokens":
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})
     let parser = number.convert(tokenToString)
-    let parsed = toSeq(parser.parse(@[token1, token2]))
+    let parsed = toSeq(parser.tokenize(@[token1, token2]))
     check parsed == @[success "1", success "2"]
 
   test "iterative parsing stops on error":
     let number = symbol(LexerToken, {LexerCategory.number})
     let parser = number.convert(tokenToString)
-    let parsed = toSeq(parser.parse(@[token1, tokenA, token2]))
+    let parsed = toSeq(parser.tokenize(@[token1, tokenA, token2]))
     check parsed.len == 2
     check parsed[0] == success "1"
     check parsed[1].isFailure

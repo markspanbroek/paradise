@@ -20,20 +20,3 @@ proc parse*[Token](parslet: Parslet[Token], input: seq[Token]): auto =
 
 proc parse*(parslet: Parslet[char], input: string): auto =
   parslet.parse(Input.new(input))
-
-iterator parse*[Token](parslet: Parslet[Token], input: Input[Token]): auto =
-  var failure = false
-  while not input.ended() and not failure:
-    let parsed = parslet.parse(input)
-    failure = parsed.isFailure
-    yield parsed
-
-iterator parse*[Token](parslet: Parslet[Token], input: seq[Token]): auto =
-  let input = Input.new(input)
-  for parsed in parslet.parse(input):
-    yield parsed
-
-iterator parse*(parslet: Parslet[char], input: string): auto =
-  let input = Input.new(input)
-  for parsed in parslet.parse(input):
-    yield parsed
