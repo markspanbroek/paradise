@@ -1,12 +1,9 @@
 import ./basics
 import ./characters
 
-type Input*[Token] = concept input
-  input.read() is ?!Token
-  input.location() is string
-  input.ended() is bool
+type Input*[Token] = ref object of RootObj
 
-type SequenceInput[Token] = ref object
+type SequenceInput[Token] = ref object of Input[Token]
   tokens: seq[Token]
   index: int
   location: int
@@ -32,7 +29,7 @@ proc read*[Token](input: SequenceInput[Token]): ?!Token =
 func ended*[Token](input: SequenceInput[Token]): bool =
   input.index >= input.tokens.len
 
-type StringInput = ref object
+type StringInput = ref object of Input[char]
   characters: string
   index: int
   location: (int, int)
