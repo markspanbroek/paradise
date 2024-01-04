@@ -1,34 +1,62 @@
 import ./basics
 import ./characters
-import ./location
 
-export location.`$`
+type Input*[Token] = concept input
+  input.read() is ?!Token
+  input.location() is string
+  input.ended() is bool
 
-type Input*[Token, Location] = ref object
-  read*: proc: ?!Token
-  location*: Location
-  atEnd*: bool
+type SequenceInput[Token] = ref object
+  tokens: seq[Token]
+  index: int
+  location: int
 
-func new[Token](_: type Input, Location: type, tokens: seq[Token]): auto =
+func new*[Token](_: type Input, tokens: seq[Token]): SequenceInput[Token] =
+  SequenceInput[Token](tokens: tokens, index: 0, location: 0)
+
+proc location*(input: SequenceInput): string =
+  "(" & $input.location & ")"
+
+proc read*[Token](input: SequenceInput[Token]): ?!Token =
   mixin endOfInput
-  var input = Input[Token, Location](location: Location.init())
-  var index = 0
-  input.read = proc: ?!Token =
-    if index < tokens.len:
-      input.location.update(tokens[index])
-      result = success tokens[index]
-      inc index
-    elif index == tokens.len:
-      result = success Token.endOfInput
-      inc index
+  if input.index < input.tokens.len:
+    result = success input.tokens[input.index]
+    inc input.index
+    inc input.location
+  elif input.index == input.tokens.len:
+    result = success Token.endOfInput
+    inc input.index
+  else:
+    result = failure "reading beyond end of input: " & location(input)
+
+func ended*[Token](input: SequenceInput[Token]): bool =
+  input.index >= input.tokens.len
+
+type StringInput = ref object
+  characters: string
+  index: int
+  location: (int, int)
+
+func new*(_: type Input, characters: string): StringInput =
+  StringInput(characters: characters, index: 0, location: (1, 1))
+
+proc location*(input: StringInput): string =
+  $input.location
+
+proc read*(input: StringInput): ?!char =
+  if input.index < input.characters.len:
+    let character = input.characters[input.index]
+    result = success character
+    inc input.index
+    if character == '\n':
+      input.location = (input.location[0] + 1, 1)
     else:
-      result = failure "reading beyond end of input " & $input.location
-    if index >= tokens.len:
-      input.atEnd = true
-  input
+      input.location = (input.location[0], input.location[1] + 1)
+  elif input.index == input.characters.len:
+    result = success '\0'
+    inc input.index
+  else:
+    result = failure "reading beyond end of input: " & location(input)
 
-func new*[Token](_: type Input, input: seq[Token]): auto =
-  Input.new(SequenceLocation, input)
-
-func new*(_: type Input, input: string): auto =
-  Input.new(TextLocation, cast[seq[char]](input))
+func ended*(input: StringInput): bool =
+  input.index >= input.characters.len

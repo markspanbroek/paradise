@@ -11,7 +11,7 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
   if token.category in symbol.categories:
     success token
   else:
-    Token.failure "expected: " & $symbol & " " & $location
+    Token.failure "expected: " & $symbol & " " & location
 
 proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
   success conversion.convert(? conversion.operand.parse(input))
@@ -24,7 +24,7 @@ proc parse*[P: Parslet[char]](parslet: P, input: string): auto =
 
 iterator parse*[Token; P: Parslet[Token]](parslet: P, input: Input): auto =
   var failure = false
-  while not input.atEnd and not failure:
+  while not input.ended() and not failure:
     let parsed = parslet.parse(input)
     failure = parsed.isFailure
     yield parsed
