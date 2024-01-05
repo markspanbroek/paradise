@@ -15,4 +15,7 @@ export tokenization.tokenize
 export tokenization.read
 export tokenization.location
 export tokenization.ended
-export tokenization.items
+
+import parsing/input
+
+export input.items

@@ -57,3 +57,10 @@ proc read*(input: StringInput): ?!char =
 
 func ended*(input: StringInput): bool =
   input.index >= input.characters.len
+
+iterator items*(input: Input): auto =
+  var failure = false
+  while not input.ended() and not failure:
+    let item = input.read()
+    failure = item.isFailure
+    yield item

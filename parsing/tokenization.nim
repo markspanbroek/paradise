@@ -29,12 +29,3 @@ func location*(tokenization: Tokenization): string =
 
 func ended*(tokenization: Tokenization): bool =
   tokenization.input.ended
-
-iterator items*(tokenization: Tokenization): auto =
-  let input = tokenization.input
-  let parslet = tokenization.parslet
-  var failure = false
-  while not input.ended() and not failure:
-    let parsed = parslet.parse(input)
-    failure = parsed.isFailure
-    yield parsed
