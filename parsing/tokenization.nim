@@ -1,18 +1,23 @@
+import ./basics
 import ./grammar
 import ./input
 import ./parser
 
-type Tokenization[P, I] = object
-  parslet: P
-  input: I
+type Tokenization[Token, ParsletType, InputType] = ref object of Input[Token]
+  parslet: ParsletType
+  input: InputType
 
-func tokenize*[P: Parslet[char]](parslet: P, input: string): auto =
-  let input = Input.new(input)
-  Tokenization[P, typeof(input)](parslet: parslet, input: input)
+func tokenize*(parslet: Parslet, input: Input): auto =
+  type Token = typeof(!parslet.parse(input))
+  type ParsletType = typeof(parslet)
+  type InputType = typeof(input)
+  Tokenization[Token, ParsletType, InputType](parslet: parslet, input: input)
 
-func tokenize*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
-  let input = Input.new(input)
-  Tokenization[P, typeof(input)](parslet: parslet, input: input)
+func tokenize*(parslet: Parslet, input: string): auto =
+  tokenize(parslet, Input.new(input))
+
+func tokenize*[Token](parslet: Parslet, input: seq[Token]): auto =
+  tokenize(parslet, Input.new(input))
 
 func read*(tokenization: Tokenization): auto =
   let parslet = tokenization.parslet
