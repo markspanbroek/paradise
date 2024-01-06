@@ -24,6 +24,19 @@ suite "string input":
     check failure.isFailure
     check failure.error.msg.contains("reading beyond end of input")
 
+  test "peeks ahead at the next character":
+    let input = Input.new("abc")
+    check input.peek() == success 'a'
+    check input.peek() == success 'a'
+    check input.read() == success 'a'
+    check input.peek() == success 'b'
+    check input.read() == success 'b'
+    check input.peek() == success 'c'
+    check input.read() == success 'c'
+    check input.peek() == success '\0'
+    check input.read() == success '\0'
+    check input.peek().isFailure
+
   test "errors include line and column location":
     proc readUntilError(input: string): ref CatchableError =
       let input = Input.new(input)
@@ -59,6 +72,19 @@ suite "token sequence input":
     let failure = input.read()
     check failure.isFailure
     check failure.error.msg.contains("reading beyond end of input")
+
+  test "peeks ahead at the next token":
+    let input = Input.new(@[token1, token2, tokenA])
+    check input.peek() == success token1
+    check input.peek() == success token1
+    check input.read() == success token1
+    check input.peek() == success token2
+    check input.read() == success token2
+    check input.peek() == success tokenA
+    check input.read() == success tokenA
+    check input.peek() == success LexerToken.endOfInput
+    check input.read() == success LexerToken.endOfInput
+    check input.peek().isFailure
 
   test "errors include sequence index":
     proc readUntilError(input: seq[LexerToken]): ref CatchableError =

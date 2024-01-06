@@ -5,12 +5,10 @@ import ./characters
 
 proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!Token =
   mixin category
-  let location = input.location
-  let token = ? input.read()
-  if token.category in symbol.categories:
-    success token
+  if (? input.peek()).category in symbol.categories:
+    input.read()
   else:
-    Token.failure "expected: " & $symbol & " " & location
+    Token.failure "expected: " & $symbol & " " & input.location
 
 proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
   conversion.operand.parse(input).map(conversion.convert)
