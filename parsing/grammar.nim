@@ -34,5 +34,5 @@ type
 func `$`*(conversion: Conversion): string =
   $conversion.operand
 
-func convert*[Token; P: Parslet[Token], From, To](parslet: P, convert: Converter[From, To]): auto =
-  Conversion[Token, P, From, To](operand: parslet, convert: convert)
+func convert*[Token; Operand: Parslet[Token], From, To](operand: Operand, convert: Converter[From, To]): auto =
+  Conversion[Token, Operand, From, To](operand: operand, convert: convert)
