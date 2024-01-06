@@ -19,6 +19,9 @@ suite "character grammars":
   test "conversion":
     check symbol({'0'..'9'}).convert(charToInt) is Parslet[char]
 
+  test "concatenation":
+    check symbol('a') & symbol('b') is Parslet[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -36,3 +39,6 @@ suite "token grammars":
 
   test "conversion":
     check number.convert(tokenToString) is Parslet[LexerToken]
+
+  test "concatenation":
+    check number & text is Parslet[LexerToken]

@@ -4,6 +4,7 @@ export grammar.`$`
 export grammar.symbol
 export grammar.finish
 export grammar.convert
+export grammar.`&`
 
 import parsing/parser
 

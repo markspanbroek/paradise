@@ -36,3 +36,13 @@ func `$`*(conversion: Conversion): string =
 
 func convert*[Token; Operand: Parslet[Token], From, To](operand: Operand, convert: Converter[From, To]): auto =
   Conversion[Token, Operand, From, To](operand: operand, convert: convert)
+
+type Concatenation*[Token, Left, Right] = ref object of Parslet[Token]
+  left*: Left
+  right*: Right
+
+func `$`*(concatenation: Concatenation): string =
+  "(" & $concatenation.left & " & " & $concatenation.right & ")"
+
+func `&`*[Token; Left, Right: Parslet[Token]](left: Left, right: Right): auto =
+  Concatenation[Token, Left, Right](left: left, right: right)

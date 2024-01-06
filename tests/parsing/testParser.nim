@@ -27,6 +27,12 @@ suite "parse characters":
     check symbol({'0'..'9'}).convert(charToInt).parse("5") == success 5
     check symbol({'0'..'9'}).convert(charToInt).parse("a").isFailure
 
+  test "concatenation":
+    let ab = symbol('a') & symbol('b')
+    check ab.parse("ab") == success ('a', 'b')
+    check ab.parse("xb").error.msg == "expected: 'a' (1, 1)"
+    check ab.parse("ax").error.msg == "expected: 'b' (1, 2)"
+
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
     let parsed = toSeq(parser.tokenize("123"))
@@ -81,6 +87,14 @@ suite "parse tokens":
     let token123 = LexerToken(category: number, value: "123")
     check text.parse(@[tokenAbc]) == success "abc"
     check text.parse(@[token123]).isFailure
+
+  test "concatenation":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let text = symbol(LexerToken, LexerCategory.text)
+    let numberAndText = number & text
+    check numberAndText.parse(@[token1, tokenA]) == success (token1, tokenA)
+    check numberAndText.parse(@[token1, token2]).error.msg == "expected: text (1)"
+    check numberAndText.parse(@[tokenA, tokenA]).error.msg == "expected: number (0)"
 
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})

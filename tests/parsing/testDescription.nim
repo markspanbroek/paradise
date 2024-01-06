@@ -27,3 +27,6 @@ suite "grammar descriptions":
   test "conversion":
     check $symbol('5').convert(charToInt) == "'5'"
     check $symbol({'1'..'5'}).convert(charToInt) == "{'1', '2', '3', '4', '5'}"
+
+  test "concatenation":
+    check $(symbol('a') & symbol('b')) == "('a' & 'b')"
