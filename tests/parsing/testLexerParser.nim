@@ -5,8 +5,6 @@ import parsing
 import ./examples/lexer
 import ./examples/conversion
 
-import parsing/input
-
 suite "lexer and parser":
 
   test "parses output of lexer":
