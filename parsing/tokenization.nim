@@ -4,20 +4,21 @@ import ./input
 import ./parser
 
 type
-  Tokenization[Token, ParsletType, InputType] = ref object of Input[Token]
+  Tokenization[Token, Location, ParsletType, InputType] = ref object of Input[Token]
     parslet: ParsletType
     input: InputType
-    peeking: ?Peeking[Token]
-  Peeking[Token] = object
+    peeking: ?Peeking[Token, Location]
+  Peeking[Token, Location] = object
     next: ?!Token
-    location: string
+    location: Location
     ended: bool
 
 func tokenize*(parslet: Parslet, input: Input): auto =
   type Token = typeof(!parslet.parse(input))
   type ParsletType = typeof(parslet)
   type InputType = typeof(input)
-  Tokenization[Token, ParsletType, InputType](parslet: parslet, input: input)
+  type Location = typeof(input.location())
+  Tokenization[Token, Location, ParsletType, InputType](parslet: parslet, input: input)
 
 func tokenize*(parslet: Parslet, input: string): auto =
   tokenize(parslet, Input.new(input))
@@ -44,7 +45,7 @@ func read*(tokenization: Tokenization): auto =
     let input = tokenization.input
     result = parslet.parse(input)
 
-func location*(tokenization: Tokenization): string =
+func location*(tokenization: Tokenization): auto =
   if peeking =? tokenization.peeking:
     peeking.location
   else:
