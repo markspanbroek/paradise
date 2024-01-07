@@ -6,21 +6,21 @@ import ./examples/conversion
 suite "character grammars":
 
   test "symbols":
-    check symbol('a') is Parslet[char]
-    check symbol('!') is Parslet[char]
+    check symbol('a') is Grammar[char]
+    check symbol('!') is Grammar[char]
 
   test "character sets":
-    check symbol({'a'..'z'}) is Parslet[char]
-    check symbol({'0'..'9'}) is Parslet[char]
+    check symbol({'a'..'z'}) is Grammar[char]
+    check symbol({'0'..'9'}) is Grammar[char]
 
   test "end of input":
-    check finish() is Parslet[char]
+    check finish() is Grammar[char]
 
   test "conversion":
-    check symbol({'0'..'9'}).convert(charToInt) is Parslet[char]
+    check symbol({'0'..'9'}).convert(charToInt) is Grammar[char]
 
   test "concatenation":
-    check symbol('a') & symbol('b') is Parslet[char]
+    check symbol('a') & symbol('b') is Grammar[char]
 
 suite "token grammars":
 
@@ -28,17 +28,17 @@ suite "token grammars":
   let text = symbol(LexerToken, LexerCategory.text)
 
   test "symbols":
-    check number is Parslet[LexerToken]
-    check text is Parslet[LexerToken]
+    check number is Grammar[LexerToken]
+    check text is Grammar[LexerToken]
 
   test "token sets":
-    check symbol(LexerToken, {LexerCategory.number, text}) is Parslet[LexerToken]
+    check symbol(LexerToken, {LexerCategory.number, text}) is Grammar[LexerToken]
 
   test "end of input":
-    check finish(LexerToken) is Parslet[LexerToken]
+    check finish(LexerToken) is Grammar[LexerToken]
 
   test "conversion":
-    check number.convert(tokenToString) is Parslet[LexerToken]
+    check number.convert(tokenToString) is Grammar[LexerToken]
 
   test "concatenation":
-    check number & text is Parslet[LexerToken]
+    check number & text is Grammar[LexerToken]

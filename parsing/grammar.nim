@@ -1,8 +1,11 @@
 import ./characters
 
-type Parslet*[Token] = ref object of RootObj
+type Grammar*[Token] = ref object of RootObj
 
-type Symbol*[Token, Category] = ref object of Parslet[Token]
+type Parslet*[Token, Category] = ref object of Grammar[Token]
+  first*: set[Category]
+
+type Symbol*[Token, Category] = ref object of Parslet[Token, Category]
   categories*: set[Category]
   description*: string
 
@@ -26,7 +29,7 @@ func finish*(Token: type = char): auto =
   symbol(Token, Token.endOfInput.category)
 
 type
-  Conversion*[Token, Operand, From, To] = ref object of Parslet[Token]
+  Conversion*[Token, Category, Operand, From, To] = ref object of Parslet[Token, Category]
     operand*: Operand
     convert*: Converter[From, To]
   Converter[From, To] = proc(input: From): To {.noSideEffect.}
@@ -34,15 +37,15 @@ type
 func `$`*(conversion: Conversion): string =
   $conversion.operand
 
-func convert*[Token; Operand: Parslet[Token], From, To](operand: Operand, convert: Converter[From, To]): auto =
-  Conversion[Token, Operand, From, To](operand: operand, convert: convert)
+func convert*[Token, Category; Operand: Parslet[Token, Category], From, To](operand: Operand, convert: Converter[From, To]): auto =
+  Conversion[Token, Category, Operand, From, To](operand: operand, convert: convert)
 
-type Concatenation*[Token, Left, Right] = ref object of Parslet[Token]
+type Concatenation*[Token, Category, Left, Right] = ref object of Parslet[Token, Category]
   left*: Left
   right*: Right
 
 func `$`*(concatenation: Concatenation): string =
   "(" & $concatenation.left & " & " & $concatenation.right & ")"
 
-func `&`*[Token; Left, Right: Parslet[Token]](left: Left, right: Right): auto =
-  Concatenation[Token, Left, Right](left: left, right: right)
+func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, right: Right): auto =
+  Concatenation[Token, Category, Left, Right](left: left, right: right)

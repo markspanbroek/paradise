@@ -4,8 +4,8 @@ import ./input
 import ./parser
 
 type
-  Tokenization[Token, Location, ParsletType, InputType] = ref object of Input[Token]
-    parslet: ParsletType
+  Tokenization[Token, Location, GrammarType, InputType] = ref object of Input[Token]
+    grammar: GrammarType
     input: InputType
     peeking: ?Peeking[Token, Location]
   Peeking[Token, Location] = object
@@ -13,26 +13,26 @@ type
     location: Location
     ended: bool
 
-func tokenize*(parslet: Parslet, input: Input): auto =
-  type Token = typeof(!parslet.parse(input))
-  type ParsletType = typeof(parslet)
+func tokenize*(grammar: Grammar, input: Input): auto =
+  type Token = typeof(!grammar.parse(input))
+  type GrammarType = typeof(grammar)
   type InputType = typeof(input)
   type Location = typeof(input.location())
-  Tokenization[Token, Location, ParsletType, InputType](parslet: parslet, input: input)
+  Tokenization[Token, Location, GrammarType, InputType](grammar: grammar, input: input)
 
-func tokenize*(parslet: Parslet, input: string): auto =
-  tokenize(parslet, Input.new(input))
+func tokenize*(grammar: Grammar, input: string): auto =
+  tokenize(grammar, Input.new(input))
 
-func tokenize*[Token](parslet: Parslet, input: seq[Token]): auto =
-  tokenize(parslet, Input.new(input))
+func tokenize*[Token](grammar: Grammar, input: seq[Token]): auto =
+  tokenize(grammar, Input.new(input))
 
 func peek*(tokenization: Tokenization): auto =
   without var peeking =? tokenization.peeking:
-    let parslet = tokenization.parslet
+    let grammar = tokenization.grammar
     let input = tokenization.input
     peeking.location = input.location
     peeking.ended = input.ended
-    peeking.next = parslet.parse(input)
+    peeking.next = grammar.parse(input)
     tokenization.peeking = some peeking
   peeking.next
 
@@ -41,9 +41,9 @@ func read*(tokenization: Tokenization): auto =
     result = peeking.next
     tokenization.peeking.reset()
   else:
-    let parslet = tokenization.parslet
+    let grammar = tokenization.grammar
     let input = tokenization.input
-    result = parslet.parse(input)
+    result = grammar.parse(input)
 
 func location*(tokenization: Tokenization): auto =
   if peeking =? tokenization.peeking:

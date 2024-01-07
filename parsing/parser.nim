@@ -11,10 +11,10 @@ proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!T
   else:
     failure "expected: " & $symbol & " " & $input.location
 
-proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, From, To], input: Input): ?!To =
+proc parse*[Token, Category, Operand, From, To](conversion: Conversion[Token, Category, Operand, From, To], input: Input): ?!To =
   conversion.operand.parse(input).map(conversion.convert)
 
-proc parse*[Token, Left, Right](concatenation: Concatenation[Token, Left, Right], input: Input): auto =
+proc parse*[Token, Category, Left, Right](concatenation: Concatenation[Token, Category, Left, Right], input: Input): auto =
   when Left is Concatenation:
     without left =? concatenation.left.parse(input) and
             right =? concatenation.right.parse(input), error:
@@ -28,8 +28,8 @@ proc parse*[Token, Left, Right](concatenation: Concatenation[Token, Left, Right]
       return Output.failure error
     success (left, right)
 
-proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
-  parslet.parse(Input.new(input))
+proc parse*[Token; G: Grammar[Token]](grammar: G, input: seq[Token]): auto =
+  grammar.parse(Input.new(input))
 
-proc parse*[P: Parslet[char]](parslet: P, input: string): auto =
-  parslet.parse(Input.new(input))
+proc parse*[G: Grammar[char]](grammar: G, input: string): auto =
+  grammar.parse(Input.new(input))
