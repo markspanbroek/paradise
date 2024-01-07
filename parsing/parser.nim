@@ -2,6 +2,7 @@ import ./basics
 import ./grammar
 import ./input
 import ./characters
+import ./tuples
 
 proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!Token =
   mixin category
@@ -14,11 +15,18 @@ proc parse*[Token, Operand, From, To](conversion: Conversion[Token, Operand, Fro
   conversion.operand.parse(input).map(conversion.convert)
 
 proc parse*[Token, Left, Right](concatenation: Concatenation[Token, Left, Right], input: Input): auto =
-  without left =? concatenation.left.parse(input) and
-          right =? concatenation.right.parse(input), error:
-    type Output = (typeof(left), typeof(right))
-    return Output.failure error
-  success (left, right)
+  when Left is Concatenation:
+    without left =? concatenation.left.parse(input) and
+            right =? concatenation.right.parse(input), error:
+      type Output = typeof(left) & typeof(right)
+      return Output.failure error
+    success left & right
+  else:
+    without left =? concatenation.left.parse(input) and
+            right =? concatenation.right.parse(input), error:
+      type Output = (typeof(left), typeof(right))
+      return Output.failure error
+    success (left, right)
 
 proc parse*[Token; P: Parslet[Token]](parslet: P, input: seq[Token]): auto =
   parslet.parse(Input.new(input))

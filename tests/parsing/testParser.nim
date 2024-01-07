@@ -33,6 +33,11 @@ suite "parse characters":
     check ab.parse("xb").error.msg == "expected: 'a' (1, 1)"
     check ab.parse("ax").error.msg == "expected: 'b' (1, 2)"
 
+  test "nested concatenation":
+    let abcd = symbol('a') & symbol('b') & symbol('c') & symbol('d')
+    check abcd.parse("abcd") == success ('a', 'b', 'c', 'd')
+    check abcd.parse("abc").error.msg == "expected: 'd' (1, 4)"
+
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
     let parsed = toSeq(parser.tokenize("123"))
