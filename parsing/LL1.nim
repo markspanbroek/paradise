@@ -11,3 +11,7 @@ func update*[Token, Category, Left, Right](concatenation: Concatenation[Token, C
   concatenation.left.update()
   concatenation.right.update()
   concatenation.first.incl(concatenation.left.first)
+
+func update*(optional: Optional) =
+  optional.operand.update()
+  optional.first.incl(optional.operand.first)

@@ -30,3 +30,7 @@ suite "grammar descriptions":
 
   test "concatenation":
     check $(symbol('a') & symbol('b')) == "('a' & 'b')"
+
+  test "optional":
+    check $(?symbol('a')) == "'a'?"
+    check $(?(symbol('x') & symbol('!'))) == "('x' & '!')?"

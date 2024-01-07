@@ -28,6 +28,9 @@ suite "first character set":
     check first(symbol('a') & symbol('b')) == {'a'}
     check first(symbol({'0'..'9'}) & symbol('!')) == {'0'..'9'}
 
+  test "optional":
+    check first((?symbol('a'))) == {'a'}
+    check first(?(symbol('a') & symbol('b'))) == {'a'}
 suite "first token set":
 
   let number = symbol(LexerToken, LexerCategory.number)

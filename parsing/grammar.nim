@@ -49,3 +49,12 @@ func `$`*(concatenation: Concatenation): string =
 
 func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, right: Right): auto =
   Concatenation[Token, Category, Left, Right](left: left, right: right)
+
+type Optional*[Token, Category, Operand] = ref object of Parslet[Token, Category]
+  operand*: Operand
+
+func `$`*(optional: Optional): string =
+  $optional.operand & "?"
+
+func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand): auto =
+  Optional[Token, Category, Operand](operand: operand)

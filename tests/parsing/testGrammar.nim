@@ -22,6 +22,10 @@ suite "character grammars":
   test "concatenation":
     check symbol('a') & symbol('b') is Grammar[char]
 
+  test "optional":
+    check ?symbol('a') is Grammar[char]
+    check ?(symbol({'0'..'9'}) & symbol('!')) is Grammar[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -42,3 +46,7 @@ suite "token grammars":
 
   test "concatenation":
     check number & text is Grammar[LexerToken]
+
+  test "optional":
+    check ?number is Grammar[LexerToken]
+    check (?text & number) is Grammar[LexerToken]
