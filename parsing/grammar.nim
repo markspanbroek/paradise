@@ -3,6 +3,7 @@ import ./characters
 type Grammar*[Token] = ref object of RootObj
 
 type Parslet*[Token, Category] = ref object of Grammar[Token]
+  canBeEmpty*: bool
   first*: set[Category]
 
 type Symbol*[Token, Category] = ref object of Parslet[Token, Category]

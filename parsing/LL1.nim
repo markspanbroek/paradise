@@ -4,14 +4,21 @@ func update*(symbol: Symbol) =
   symbol.first.incl(symbol.categories)
 
 func update*(conversion: Conversion) =
-  conversion.operand.update()
-  conversion.first.incl(conversion.operand.first)
+  let operand = conversion.operand
+  operand.update()
+  conversion.canBeEmpty = operand.canBeEmpty
+  conversion.first.incl(operand.first)
 
 func update*(concatenation: Concatenation) =
-  concatenation.left.update()
-  concatenation.right.update()
-  concatenation.first.incl(concatenation.left.first)
+  let left = concatenation.left
+  let right = concatenation.right
+  left.update()
+  right.update()
+  concatenation.canBeEmpty = left.canBeEmpty and right.canBeEmpty
+  concatenation.first.incl(left.first)
 
 func update*(optional: Optional) =
-  optional.operand.update()
-  optional.first.incl(optional.operand.first)
+  let operand = optional.operand
+  operand.update()
+  optional.canBeEmpty = true
+  optional.first.incl(operand.first)
