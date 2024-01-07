@@ -4,18 +4,21 @@ import ./input
 import ./characters
 import ./tuples
 
-proc parse*[Token, Category](symbol: Symbol[Token, Category], input: Input): ?!Token =
+proc parse*(symbol: Symbol, input: Input): auto =
   mixin category
-  if (? input.peek()).category in symbol.categories:
+  let peek = input.peek()
+  without token =? peek:
+    return peek
+  if token.category in symbol.categories:
     input.read()
   else:
-    failure "expected: " & $symbol & " " & $input.location
+    typeof(token).failure "expected: " & $symbol & " " & $input.location
 
-proc parse*[Token, Category, Operand, From, To](conversion: Conversion[Token, Category, Operand, From, To], input: Input): ?!To =
+proc parse*(conversion: Conversion, input: Input): auto =
   conversion.operand.parse(input).map(conversion.convert)
 
-proc parse*[Token, Category, Left, Right](concatenation: Concatenation[Token, Category, Left, Right], input: Input): auto =
-  when Left is Concatenation:
+proc parse*[C: Concatenation](concatenation: C, input: Input): auto =
+  when concatenation.left is Concatenation:
     without left =? concatenation.left.parse(input) and
             right =? concatenation.right.parse(input), error:
       type Output = typeof(left) & typeof(right)
