@@ -16,6 +16,8 @@ func update*(concatenation: Concatenation) =
   right.update()
   concatenation.canBeEmpty = left.canBeEmpty and right.canBeEmpty
   concatenation.first.incl(left.first)
+  if left.canBeEmpty:
+    concatenation.first.incl(right.first)
 
 func update*(optional: Optional) =
   let operand = optional.operand
