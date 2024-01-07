@@ -1,5 +1,10 @@
 import ./grammar
 
+func update*(symbol: Symbol)
+func update*(conversion: Conversion)
+func update*(concatenation: Concatenation)
+func update*(optional: Optional)
+
 func update*(symbol: Symbol) =
   symbol.first.incl(symbol.categories)
 

@@ -1,6 +1,7 @@
 import std/unittest
 import std/strutils
 import std/sequtils
+import pkg/questionable
 import pkg/questionable/results
 import parsing
 import parsing/input
@@ -37,6 +38,12 @@ suite "parse characters":
     let abcd = symbol('a') & symbol('b') & symbol('c') & symbol('d')
     check abcd.parse("abcd") == success ('a', 'b', 'c', 'd')
     check abcd.parse("abc").error.msg == "expected: 'd' (1, 4)"
+
+  test "optional":
+    check (?symbol('a')).parse("a") == success some 'a'
+    check (?symbol('a')).parse("") == success none char
+    check (?symbol('a') & symbol('b')).parse("ab") == success (some 'a', 'b')
+    check (?symbol('a') & symbol('b')).parse("b") == success (none char, 'b')
 
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
@@ -100,6 +107,14 @@ suite "parse tokens":
     check numberAndText.parse(@[token1, tokenA]) == success (token1, tokenA)
     check numberAndText.parse(@[token1, token2]).error.msg == "expected: text (1)"
     check numberAndText.parse(@[tokenA, tokenA]).error.msg == "expected: number (0)"
+
+  test "optional":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let text = symbol(LexerToken, LexerCategory.text)
+    check (?number).parse(@[token1]) == success some token1
+    check (?number).parse(@[]) == success none LexerToken
+    check (?number & text).parse(@[token1, tokenA]) == success (some token1, tokenA)
+    check (?number & text).parse(@[tokenA]) == success (none LexerToken, tokenA)
 
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})

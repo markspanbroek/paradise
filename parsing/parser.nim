@@ -3,6 +3,7 @@ import ./grammar
 import ./input
 import ./characters
 import ./tuples
+import ./LL1
 
 proc parse*(symbol: Symbol, input: Input): auto =
   mixin category
@@ -31,8 +32,25 @@ proc parse*[C: Concatenation](concatenation: C, input: Input): auto =
       return Output.failure error
     success (left, right)
 
+proc parse*(optional: Optional, input: Input): auto =
+  mixin category
+  let operand = optional.operand
+  type Output = typeof(!operand.parse(input))
+  without peek =? input.peek(), error:
+    return failure(?Output, error)
+  if peek.category in operand.first:
+    without value =? operand.parse(input), error:
+      return failure(?Output, error)
+    success some value
+  else:
+    success none Output
+
+proc parser*[Token; G: Grammar[Token]](grammar: G): auto =
+  grammar.update()
+  grammar
+
 proc parse*[Token; G: Grammar[Token]](grammar: G, input: seq[Token]): auto =
-  grammar.parse(Input.new(input))
+  grammar.parser.parse(Input.new(input))
 
 proc parse*[G: Grammar[char]](grammar: G, input: string): auto =
-  grammar.parse(Input.new(input))
+  grammar.parser.parse(Input.new(input))
