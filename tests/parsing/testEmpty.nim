@@ -1,5 +1,7 @@
 import std/unittest
+import pkg/questionable
 import parsing/grammar
+import parsing/recursion
 import parsing/LL1
 import ./examples/conversion
 
@@ -32,3 +34,12 @@ suite "empty":
   test "conversion":
     check canBeEmpty((?symbol('5')).convert(charToInt))
     check not canBeEmpty(symbol('5').convert(charToInt))
+
+  test "recursive rules":
+    let a = recursive char
+    define a: symbol('a') & a
+    check not canBeEmpty a
+
+    let b = recursive ?char
+    define b: ?symbol('b')
+    check canBeEmpty b

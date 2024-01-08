@@ -59,3 +59,14 @@ func `$`*(optional: Optional): string =
 
 func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand): auto =
   Optional[Token, Category, Operand](operand: operand)
+
+type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
+  updateClosure*: proc() {.noSideEffect.}
+
+func recursive*(Token, Output: type): auto =
+  mixin category
+  type Category = typeof(Token.default.category)
+  Recursion[Token, Category, Output]()
+
+func recursive*(Output: type): auto =
+  recursive(char, Output)

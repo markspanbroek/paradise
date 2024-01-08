@@ -1,6 +1,8 @@
 import std/unittest
+import pkg/questionable
 import parsing/grammar
 import parsing/LL1
+import parsing/recursion
 import ./examples/conversion
 import ./examples/lexer
 
@@ -35,6 +37,12 @@ suite "first character set":
     check first((?symbol('a') & symbol('b') & symbol('c'))) == {'a', 'b'}
     check first((?symbol('a') & ?symbol('b') & symbol('c'))) == {'a', 'b', 'c'}
 
+  test "recursive rules":
+    let rule = recursive char
+    proc count(parsed: (?int, char)): int = (parsed[0] |? 0) + 1
+    define rule: (?rule & symbol('x')).convert(count)
+    check first(rule) == {'x'}
+
 suite "first token set":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -57,3 +65,9 @@ suite "first token set":
   test "concatenation":
     check first(number & text) == {LexerCategory.number}
     check first(text & number) == {LexerCategory.text}
+
+  test "recursive rules":
+    let rule = recursive(LexerToken, int)
+    proc count(parsed: (?int, LexerToken)): int = (parsed[0] |? 0) + 1
+    define rule: (?rule & symbol(LexerToken, LexerCategory.number)).convert(count)
+    check first(rule) == {LexerCategory.number}

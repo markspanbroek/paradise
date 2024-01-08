@@ -4,6 +4,7 @@ func update*(symbol: Symbol)
 func update*(conversion: Conversion)
 func update*(concatenation: Concatenation)
 func update*(optional: Optional)
+func update*(rule: Recursion)
 
 func update*(symbol: Symbol) =
   symbol.first.incl(symbol.categories)
@@ -29,3 +30,6 @@ func update*(optional: Optional) =
   operand.update()
   optional.canBeEmpty = true
   optional.first.incl(operand.first)
+
+func update*(rule: Recursion) =
+  rule.updateClosure()

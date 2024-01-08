@@ -1,5 +1,6 @@
 import std/unittest
 import parsing/grammar
+import parsing/recursion
 import ./examples/lexer
 import ./examples/conversion
 
@@ -26,6 +27,10 @@ suite "character grammars":
     check ?symbol('a') is Grammar[char]
     check ?(symbol({'0'..'9'}) & symbol('!')) is Grammar[char]
 
+  test "recursive rules":
+    let rule = recursive int
+    check rule is Grammar[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -50,3 +55,7 @@ suite "token grammars":
   test "optional":
     check ?number is Grammar[LexerToken]
     check (?text & number) is Grammar[LexerToken]
+
+  test "recursive rules":
+    let rule = recursive(LexerToken, int)
+    check rule is Grammar[LexerToken]
