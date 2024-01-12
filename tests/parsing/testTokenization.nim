@@ -34,7 +34,7 @@ suite "tokenization":
 
   test "location does not change when peeking":
     let tokens = digit.tokenize("123")
-    let before = tokens.location()
+    let before = tokens.location
     discard tokens.peek()
     let after = tokens.location
     check before == after

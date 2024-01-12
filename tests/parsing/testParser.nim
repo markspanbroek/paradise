@@ -105,8 +105,8 @@ suite "parse tokens":
     let text = symbol(LexerToken, LexerCategory.text)
     let numberAndText = number & text
     check numberAndText.parse(@[token1, tokenA]) == success (token1, tokenA)
-    check numberAndText.parse(@[token1, token2]).error.msg == "expected: text (1)"
-    check numberAndText.parse(@[tokenA, tokenA]).error.msg == "expected: number (0)"
+    check numberAndText.parse(@[token1, token2]).error.msg == "expected: text (0, 1)"
+    check numberAndText.parse(@[tokenA, tokenA]).error.msg == "expected: number (0, 0)"
 
   test "optional":
     let number = symbol(LexerToken, LexerCategory.number)
@@ -136,4 +136,4 @@ suite "parse tokens":
     for _ in 1..2: # read up to "a"
       discard input.read()
     let error = parser.parse(input).error
-    check error.msg.contains("(2)")
+    check error.msg.contains("(0, 2)")

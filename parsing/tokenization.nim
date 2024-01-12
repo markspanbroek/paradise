@@ -17,7 +17,7 @@ func tokenize*(grammar: Grammar, input: Input): auto =
   type Token = typeof(!grammar.parse(input))
   type GrammarType = typeof(grammar)
   type InputType = typeof(input)
-  type Location = typeof(input.location())
+  type Location = typeof(input.location)
   Tokenization[Token, Location, GrammarType, InputType](grammar: grammar, input: input)
 
 func tokenize*(grammar: Grammar, input: string): auto =

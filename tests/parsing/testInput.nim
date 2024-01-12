@@ -93,6 +93,6 @@ suite "token sequence input":
       while outcome.isSuccess:
         outcome = input.read()
       outcome.error
-    check readUntilError(@[]).msg.contains("(0)")
-    check readUntilError(@[token1, token2]).msg.contains("(2)")
-    check readUntilError(@[token1, token2, tokenA]).msg.contains("(3)")
+    check readUntilError(@[]).msg.contains("(0, 0)")
+    check readUntilError(@[token1, token2]).msg.contains("(0, 2)")
+    check readUntilError(@[token1, token2, tokenA]).msg.contains("(0, 3)")

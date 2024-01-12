@@ -1,25 +1,24 @@
 import ./basics
 import ./characters
 
-type Input*[Token] = ref object of RootObj
+type
+  Input*[Token] = ref object of RootObj
+    location*: Location
+  Location = object
+    line: int
+    column: int
+
+func `$`*(location: Location): string =
+  "(" & $location.line & ", " & $location.column & ")"
 
 type
   SequenceInput[Token] = ref object of Input[Token]
     tokens: seq[Token]
     index: int
-    location: SequenceLocation
-  SequenceLocation = object
-    index: int
 
 func new*[Token](_: type Input, tokens: seq[Token]): SequenceInput[Token] =
-  let location = SequenceLocation(index: 0)
+  let location = Location(line: 0, column: 0)
   SequenceInput[Token](tokens: tokens, index: 0, location: location)
-
-func `$`*(location: SequenceLocation): string =
-  "(" & $location.index & ")"
-
-proc location*(input: SequenceInput): SequenceLocation =
-  input.location
 
 proc peek*[Token](input: SequenceInput[Token]): ?!Token =
   mixin endOfInput
@@ -28,13 +27,13 @@ proc peek*[Token](input: SequenceInput[Token]): ?!Token =
   elif input.index == input.tokens.len:
     result = success Token.endOfInput
   else:
-    result = failure "reading beyond end of input: " & $location(input)
+    result = failure "reading beyond end of input: " & $input.location
 
 proc read*[Token](input: SequenceInput[Token]): ?!Token =
   result = input.peek()
   if result.isSuccess:
     if input.index < input.tokens.len:
-      inc input.location.index
+      inc input.location.column
     inc input.index
 
 func ended*[Token](input: SequenceInput[Token]): bool =
@@ -44,20 +43,10 @@ type
   StringInput = ref object of Input[char]
     characters: string
     index: int
-    location: TextLocation
-  TextLocation = object
-    line: int
-    column: int
 
 func new*(_: type Input, characters: string): StringInput =
-  let location = TextLocation(line: 1, column: 1)
+  let location = Location(line: 1, column: 1)
   StringInput(characters: characters, index: 0, location: location)
-
-func `$`*(location: TextLocation): string =
-  "(" & $location.line & ", " & $location.column & ")"
-
-proc location*(input: StringInput): TextLocation =
-  input.location
 
 proc peek*(input: StringInput): ?!char =
   if input.index < input.characters.len:
@@ -66,7 +55,7 @@ proc peek*(input: StringInput): ?!char =
   elif input.index == input.characters.len:
     result = success '\0'
   else:
-    result = failure "reading beyond end of input: " & $location(input)
+    result = failure "reading beyond end of input: " & $input.location
 
 proc read*(input: StringInput): ?!char =
   result = input.peek()
