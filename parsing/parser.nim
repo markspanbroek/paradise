@@ -13,7 +13,7 @@ proc parse*(symbol: Symbol, input: Input): auto =
   if token.category in symbol.categories:
     input.read()
   else:
-    typeof(token).failure "expected: " & $symbol & " " & $input.location
+    typeof(token).failure "expected: " & $symbol & " " & $input.location()
 
 proc parse*(conversion: Conversion, input: Input): auto =
   conversion.operand.parse(input).map(conversion.convert)

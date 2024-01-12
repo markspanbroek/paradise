@@ -14,10 +14,6 @@ export parser.parse
 import parsing/tokenization
 
 export tokenization.tokenize
-export tokenization.peek
-export tokenization.read
-export tokenization.location
-export tokenization.ended
 
 import parsing/input
 

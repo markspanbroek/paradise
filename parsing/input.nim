@@ -3,73 +3,67 @@ import ./characters
 
 type
   Input*[Token] = ref object of RootObj
-    location*: Location
-  Location = object
+    peek*: proc: ?!Token
+    read*: proc: ?!Token
+    ended*: proc: bool
+    location*: proc: Location
+  Location* = object
     line: int
     column: int
 
 func `$`*(location: Location): string =
   "(" & $location.line & ", " & $location.column & ")"
 
-type
-  SequenceInput[Token] = ref object of Input[Token]
-    tokens: seq[Token]
-    index: int
-
-func new*[Token](_: type Input, tokens: seq[Token]): SequenceInput[Token] =
-  let location = Location(line: 0, column: 0)
-  SequenceInput[Token](tokens: tokens, index: 0, location: location)
-
-proc peek*[Token](input: SequenceInput[Token]): ?!Token =
+func new*[Token](_: type Input, tokens: seq[Token]): Input[Token] =
   mixin endOfInput
-  if input.index < input.tokens.len:
-    result = success input.tokens[input.index]
-  elif input.index == input.tokens.len:
-    result = success Token.endOfInput
-  else:
-    result = failure "reading beyond end of input: " & $input.location
+  let input = Input[Token]()
+  var index = 0
+  var location = Location(line: 0, column: 0)
+  input.peek = proc: ?!Token =
+    if index < tokens.len:
+      success tokens[index]
+    elif index == tokens.len:
+      success Token.endOfInput
+    else:
+      failure "reading beyond end of input: " & $location
+  input.read = proc: ?!Token =
+    result = input.peek()
+    if result.isSuccess:
+      if index < tokens.len:
+        inc location.column
+      inc index
+  input.ended = proc: bool =
+    index >= tokens.len
+  input.location = proc: Location =
+    location
+  input
 
-proc read*[Token](input: SequenceInput[Token]): ?!Token =
-  result = input.peek()
-  if result.isSuccess:
-    if input.index < input.tokens.len:
-      inc input.location.column
-    inc input.index
-
-func ended*[Token](input: SequenceInput[Token]): bool =
-  input.index >= input.tokens.len
-
-type
-  StringInput = ref object of Input[char]
-    characters: string
-    index: int
-
-func new*(_: type Input, characters: string): StringInput =
-  let location = Location(line: 1, column: 1)
-  StringInput(characters: characters, index: 0, location: location)
-
-proc peek*(input: StringInput): ?!char =
-  if input.index < input.characters.len:
-    let character = input.characters[input.index]
-    result = success character
-  elif input.index == input.characters.len:
-    result = success '\0'
-  else:
-    result = failure "reading beyond end of input: " & $input.location
-
-proc read*(input: StringInput): ?!char =
-  result = input.peek()
-  if result.isSuccess:
-    if input.index < input.characters.len:
-      if !result == '\n':
-        inc input.location.line
-        input.location.column = 1
-      else:
-        inc input.location.column
-    inc input.index
-
-func ended*(input: StringInput): bool =
-  input.index >= input.characters.len
+func new*(_: type Input, characters: string): Input[char] =
+  let input = Input[char]()
+  var index = 0
+  var location = Location(line: 1, column: 1)
+  input.peek = proc: ?!char =
+    if index < characters.len:
+      success characters[index]
+    elif index == characters.len:
+      success '\0'
+    else:
+      failure "reading beyond end of input: " & $location
+  input.read = proc: ?!char =
+    result = input.peek()
+    if result.isSuccess:
+      if index < characters.len:
+        if !result == '\n':
+          inc location.line
+          location.column = 1
+        else:
+          inc location.column
+      inc index
+  input.ended = proc: bool =
+    index >= characters.len
+  input.location = proc: Location =
+    location
+  input
 
 iterator items*(input: Input): auto =
   var failure = false
