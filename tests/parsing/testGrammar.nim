@@ -1,6 +1,5 @@
 import std/unittest
 import parsing/grammar
-import parsing/recursion
 import ./examples/lexer
 import ./examples/conversion
 
