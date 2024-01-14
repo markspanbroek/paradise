@@ -13,6 +13,6 @@ func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, defi
       rule.canBeEmpty = definition.canBeEmpty
       rule.first.incl(definition.first)
       updating = false
-  rule.parseClosure = proc(input: Input[Token]) =
+  rule.runClosure = proc(input: Input[Token]) =
     bind basics.error
     rule.output = definition.parse(input)

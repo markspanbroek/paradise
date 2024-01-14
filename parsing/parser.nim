@@ -56,7 +56,7 @@ proc run(optional: Optional, input: Input) =
     optional.output = success none Output
 
 proc run(rule: Recursion, input: Input) =
-  rule.parseClosure(input)
+  rule.runClosure(input)
 
 proc parser*(grammar: Grammar): auto =
   grammar.update()
