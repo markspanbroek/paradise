@@ -8,13 +8,13 @@ import ./LL1
 type Parser*[G] = object
   grammar: G
 
-proc parse*(symbol: Symbol, input: Input)
-proc parse*(conversion: Conversion, input: Input)
-proc parse*[C: Concatenation](concatenation: C, input: Input)
-proc parse*(optional: Optional, input: Input)
-proc parse*(rule: Recursion, input: Input)
+proc run*(symbol: Symbol, input: Input)
+proc run*(conversion: Conversion, input: Input)
+proc run*[C: Concatenation](concatenation: C, input: Input)
+proc run*(optional: Optional, input: Input)
+proc run*(rule: Recursion, input: Input)
 
-proc parse*(symbol: Symbol, input: Input) =
+proc run*(symbol: Symbol, input: Input) =
   mixin category
   let peek = input.peek()
   without token =? peek:
@@ -24,14 +24,14 @@ proc parse*(symbol: Symbol, input: Input) =
   else:
     symbol.output = typeof(token).failure "expected: " & $symbol & " " & $input.location()
 
-proc parse*(conversion: Conversion, input: Input) =
-  conversion.operand.parse(input)
+proc run*(conversion: Conversion, input: Input) =
+  conversion.operand.run(input)
   conversion.output = conversion.operand.output.map(conversion.convert)
 
-proc parse*[C: Concatenation](concatenation: C, input: Input) =
-  concatenation.left.parse(input)
+proc run*[C: Concatenation](concatenation: C, input: Input) =
+  concatenation.left.run(input)
   if concatenation.left.output.isSuccess:
-    concatenation.right.parse(input)
+    concatenation.right.run(input)
   type Output = typeof(!concatenation.output)
   when concatenation.left is Concatenation:
     without left =? concatenation.left.output and
@@ -46,7 +46,7 @@ proc parse*[C: Concatenation](concatenation: C, input: Input) =
       return
     concatenation.output = success (left, right)
 
-proc parse*(optional: Optional, input: Input) =
+proc run*(optional: Optional, input: Input) =
   mixin category
   let operand = optional.operand
   type Output = typeof(!operand.output)
@@ -54,7 +54,7 @@ proc parse*(optional: Optional, input: Input) =
     optional.output = failure(?Output, error)
     return
   if peek.category in operand.first:
-    operand.parse(input)
+    operand.run(input)
     without value =? operand.output, error:
       optional.output = failure(?Output, error)
       return
@@ -62,11 +62,11 @@ proc parse*(optional: Optional, input: Input) =
   else:
     optional.output = success none Output
 
-proc parse*(rule: Recursion, input: Input) =
+proc run*(rule: Recursion, input: Input) =
   rule.parseClosure(input)
 
 proc parse*(parser: Parser, input: Input): auto =
-  parser.grammar.parse(input)
+  parser.grammar.run(input)
   parser.grammar.output
 
 proc parser*[Token; G: Grammar[Token]](grammar: G): Parser[G] =

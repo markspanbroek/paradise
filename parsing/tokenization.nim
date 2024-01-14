@@ -16,7 +16,7 @@ func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
     without var peeking =? peeked:
       peeking.location = input.location()
       peeking.ended = input.ended()
-      grammar.parse(input)
+      grammar.run(input)
       peeking.next = grammar.output
       peeked = some peeking
     peeking.next
@@ -25,7 +25,7 @@ func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
       result = peeking.next
       peeked = none Peek[Out]
     else:
-      grammar.parse(input)
+      grammar.run(input)
       result = grammar.output
   output.ended = proc: bool =
     if peeking =? peeked:
