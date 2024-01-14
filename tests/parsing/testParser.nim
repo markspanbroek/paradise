@@ -125,6 +125,16 @@ suite "parse tokens":
     check (?number & text).parse(@[token1, tokenA]) == success (some token1, tokenA)
     check (?number & text).parse(@[tokenA]) == success (none LexerToken, tokenA)
 
+  test "recursive rules":
+    let numbers = recursive(LexerToken, int)
+    let number = symbol(LexerToken, LexerCategory.number)
+    proc length(parsed: ?(LexerToken, int)): int = (parsed.?[1] + 1) |? 0
+    define numbers: (?(number & numbers)).convert(length)
+    check numbers.parse(@[]) == success 0
+    check numbers.parse(@[token1]) == success 1
+    check numbers.parse(@[token1, token2]) == success 2
+    check numbers.parse(@[token1, token2, token1]) == success 3
+
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})
     let parser = number.convert(tokenToString)
