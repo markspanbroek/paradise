@@ -7,9 +7,9 @@ import ./examples/conversion
 
 suite "empty":
 
-  proc canBeEmpty[Token, Category; P: Parslet[Token, Category]](parslet: P): auto =
-    parslet.update()
-    parslet.canBeEmpty
+  proc canBeEmpty(grammar: Grammar): bool =
+    grammar.update()
+    grammar.canBeEmpty
 
   test "symbols":
     check not canBeEmpty(symbol('a'))

@@ -6,9 +6,9 @@ import parsing/recursion
 import ./examples/conversion
 import ./examples/lexer
 
-proc first[Token, Category; P: Parslet[Token, Category]](parslet: P): auto =
-  parslet.update()
-  parslet.first
+proc first(grammar: Grammar): auto =
+  grammar.update()
+  grammar.first
 
 suite "first character set":
 
