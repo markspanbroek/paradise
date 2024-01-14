@@ -9,14 +9,15 @@ type Peek[Token] = object
   ended: bool
 
 func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
-  type Out = typeof(!grammar.parse(input))
+  type Out = typeof(!grammar.output)
   let output = Input[Out]()
   var peeked: ?Peek[Out]
   output.peek = proc: ?!Out =
     without var peeking =? peeked:
       peeking.location = input.location()
       peeking.ended = input.ended()
-      peeking.next = grammar.parse(input)
+      grammar.parse(input)
+      peeking.next = grammar.output
       peeked = some peeking
     peeking.next
   output.read = proc: ?!Out =
@@ -24,7 +25,8 @@ func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
       result = peeking.next
       peeked = none Peek[Out]
     else:
-      result = grammar.parse(input)
+      grammar.parse(input)
+      result = grammar.output
   output.ended = proc: bool =
     if peeking =? peeked:
       peeking.ended

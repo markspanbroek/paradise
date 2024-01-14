@@ -6,9 +6,14 @@ export grammar.finish
 export grammar.convert
 export grammar.`&`
 export grammar.`?`
+export grammar.recursive
+
+import parsing/recursion
+export recursion.define
 
 import parsing/parser
 
+export parser.parser
 export parser.parse
 
 import parsing/tokenization

@@ -45,6 +45,15 @@ suite "parse characters":
     check (?symbol('a') & symbol('b')).parse("ab") == success (some 'a', 'b')
     check (?symbol('a') & symbol('b')).parse("b") == success (none char, 'b')
 
+  test "recursive rules":
+    let x = recursive int
+    proc length(parsed: ?(char, int)): int = (parsed.?[1] + 1) |? 0
+    define x: (?(symbol('x') & x)).convert(length)
+    check x.parse("") == success 0
+    check x.parse("x") == success 1
+    check x.parse("xx") == success 2
+    check x.parse("xxx") == success 3
+
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
     let parsed = toSeq(parser.tokenize("123"))
@@ -59,11 +68,11 @@ suite "parse characters":
     check parsed[2].isFailure
 
   test "errors include line and column location":
-    let parser = symbol('o')
+    let grammar = symbol('o')
     let input = Input.new("o\no\noxo")
     for _ in 1..5: # read up to 'x'
       discard input.read()
-    let error = parser.parse(input).error
+    let error = grammar.parser.parse(input).error
     check error.msg.contains("(3, 2)")
 
 suite "parse tokens":
@@ -131,9 +140,9 @@ suite "parse tokens":
     check parsed[1].isFailure
 
   test "errors include sequence index":
-    let parser = symbol(LexerToken, LexerCategory.number)
+    let grammar = symbol(LexerToken, LexerCategory.number)
     let input = Input.new(@[token1, token2, tokenA])
     for _ in 1..2: # read up to "a"
       discard input.read()
-    let error = parser.parse(input).error
+    let error = grammar.parser.parse(input).error
     check error.msg.contains("(0, 2)")

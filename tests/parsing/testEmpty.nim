@@ -37,7 +37,7 @@ suite "empty":
 
   test "recursive rules":
     let a = recursive char
-    define a: symbol('a') & a
+    define a: symbol('a')
     check not canBeEmpty a
 
     let b = recursive ?char

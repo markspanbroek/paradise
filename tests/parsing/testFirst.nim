@@ -38,7 +38,7 @@ suite "first character set":
     check first((?symbol('a') & ?symbol('b') & symbol('c'))) == {'a', 'b', 'c'}
 
   test "recursive rules":
-    let rule = recursive char
+    let rule = recursive int
     proc count(parsed: (?int, char)): int = (parsed[0] |? 0) + 1
     define rule: (?rule & symbol('x')).convert(count)
     check first(rule) == {'x'}
