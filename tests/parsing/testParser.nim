@@ -72,7 +72,7 @@ suite "parse characters":
     let input = Input.new("o\no\noxo")
     for _ in 1..5: # read up to 'x'
       discard input.read()
-    let error = grammar.parser.parse(input).error
+    let error = grammar.parse(input).error
     check error.msg.contains("(3, 2)")
 
 suite "parse tokens":
@@ -144,5 +144,5 @@ suite "parse tokens":
     let input = Input.new(@[token1, token2, tokenA])
     for _ in 1..2: # read up to "a"
       discard input.read()
-    let error = grammar.parser.parse(input).error
+    let error = grammar.parse(input).error
     check error.msg.contains("(0, 2)")
