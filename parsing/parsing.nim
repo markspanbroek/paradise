@@ -3,7 +3,6 @@ import ./grammar
 import ./input
 import ./characters
 import ./tuples
-import ./LL1
 
 proc run(symbol: Symbol, input: Input)
 proc run(conversion: Conversion, input: Input)
@@ -57,13 +56,3 @@ proc run(optional: Optional, input: Input) =
 
 proc run(rule: Recursion, input: Input) =
   rule.runClosure(input)
-
-proc parser*(grammar: Grammar): auto =
-  grammar.update()
-  grammar
-
-proc parse*[Token; G: Grammar[Token]](grammar: G, input: seq[Token]): auto =
-  grammar.parser.parse(Input.new(input))
-
-proc parse*[G: Grammar[char]](grammar: G, input: string): auto =
-  grammar.parser.parse(Input.new(input))

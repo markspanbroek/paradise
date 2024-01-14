@@ -1,22 +1,22 @@
 import ./basics
 import ./grammar
 import ./input
-import ./parsing
+import ./parser
 
 type Peek[Token] = object
   next: ?!Token
   location: Location
   ended: bool
 
-func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
-  type Out = typeof(!grammar.output)
+func tokenize*[In](parser: Parser, input: Input[In]): auto =
+  type Out = typeof(!parser.parse(input))
   let output = Input[Out]()
   var peeked: ?Peek[Out]
   output.peek = proc: ?!Out =
     without var peeking =? peeked:
       peeking.location = input.location()
       peeking.ended = input.ended()
-      peeking.next = grammar.parse(input)
+      peeking.next = parser.parse(input)
       peeked = some peeking
     peeking.next
   output.read = proc: ?!Out =
@@ -24,7 +24,7 @@ func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
       result = peeking.next
       peeked = none Peek[Out]
     else:
-      result = grammar.parse(input)
+      result = parser.parse(input)
   output.ended = proc: bool =
     if peeking =? peeked:
       peeking.ended
@@ -32,8 +32,11 @@ func tokenize*[In](grammar: Grammar, input: Input[In]): auto =
       input.ended()
   output
 
-func tokenize*(grammar: Grammar, input: string): auto =
-  tokenize(grammar, Input.new(input))
+func tokenize*(parser: Parser, input: string): auto =
+  tokenize(parser, Input.new(input))
 
-func tokenize*[Token](grammar: Grammar, input: seq[Token]): auto =
-  tokenize(grammar, Input.new(input))
+func tokenize*[Token; G: Grammar[Token]](parser: Parser[G], input: seq[Token]): auto =
+  tokenize(parser, Input.new(input))
+
+template tokenize*(grammar: Grammar, input: untyped): auto =
+  grammar.parser.tokenize(input)
