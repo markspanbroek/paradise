@@ -15,5 +15,4 @@ func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, defi
       updating = false
   rule.parseClosure = proc(input: Input[Token]) =
     bind basics.error
-    definition.run(input)
-    rule.output = definition.output
+    rule.output = definition.parse(input)

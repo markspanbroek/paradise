@@ -5,16 +5,18 @@ import ./characters
 import ./tuples
 import ./LL1
 
-type Parser*[G] = object
-  grammar: G
+proc run(symbol: Symbol, input: Input)
+proc run(conversion: Conversion, input: Input)
+proc run[C: Concatenation](concatenation: C, input: Input)
+proc run(optional: Optional, input: Input)
+proc run(rule: Recursion, input: Input)
 
-proc run*(symbol: Symbol, input: Input)
-proc run*(conversion: Conversion, input: Input)
-proc run*[C: Concatenation](concatenation: C, input: Input)
-proc run*(optional: Optional, input: Input)
-proc run*(rule: Recursion, input: Input)
+proc parse*(grammar: Grammar, input: Input): auto =
+  grammar.run(input)
+  result = grammar.output
+  grammar.output.reset()
 
-proc run*(symbol: Symbol, input: Input) =
+proc run(symbol: Symbol, input: Input) =
   mixin category
   let peek = input.peek()
   without token =? peek:
@@ -24,29 +26,21 @@ proc run*(symbol: Symbol, input: Input) =
   else:
     symbol.output = typeof(token).failure "expected: " & $symbol & " " & $input.location()
 
-proc run*(conversion: Conversion, input: Input) =
-  conversion.operand.run(input)
-  conversion.output = conversion.operand.output.map(conversion.convert)
+proc run(conversion: Conversion, input: Input) =
+  conversion.output = conversion.operand.parse(input).map(conversion.convert)
 
-proc run*[C: Concatenation](concatenation: C, input: Input) =
-  concatenation.left.run(input)
-  if concatenation.left.output.isSuccess:
-    concatenation.right.run(input)
+proc run[C: Concatenation](concatenation: C, input: Input) =
   type Output = typeof(!concatenation.output)
+  without left =? concatenation.left.parse(input) and
+          right =? concatenation.right.parse(input), error:
+    concatenation.output = Output.failure error
+    return
   when concatenation.left is Concatenation:
-    without left =? concatenation.left.output and
-            right =? concatenation.right.output, error:
-      concatenation.output = Output.failure error
-      return
     concatenation.output = success left & right
   else:
-    without left =? concatenation.left.output and
-            right =? concatenation.right.output, error:
-      concatenation.output = Output.failure error
-      return
     concatenation.output = success (left, right)
 
-proc run*(optional: Optional, input: Input) =
+proc run(optional: Optional, input: Input) =
   mixin category
   let operand = optional.operand
   type Output = typeof(!operand.output)
@@ -54,24 +48,19 @@ proc run*(optional: Optional, input: Input) =
     optional.output = failure(?Output, error)
     return
   if peek.category in operand.first:
-    operand.run(input)
-    without value =? operand.output, error:
+    without value =? operand.parse(input), error:
       optional.output = failure(?Output, error)
       return
     optional.output = success some value
   else:
     optional.output = success none Output
 
-proc run*(rule: Recursion, input: Input) =
+proc run(rule: Recursion, input: Input) =
   rule.parseClosure(input)
 
-proc parse*(parser: Parser, input: Input): auto =
-  parser.grammar.run(input)
-  parser.grammar.output
-
-proc parser*[Token; G: Grammar[Token]](grammar: G): Parser[G] =
+proc parser*(grammar: Grammar): auto =
   grammar.update()
-  Parser[G](grammar: grammar)
+  grammar
 
 proc parse*[Token; G: Grammar[Token]](grammar: G, input: seq[Token]): auto =
   grammar.parser.parse(Input.new(input))
