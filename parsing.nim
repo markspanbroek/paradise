@@ -11,10 +11,10 @@ export grammar.recursive
 import parsing/recursion
 export recursion.define
 
-import parsing/parser
+import parsing/parsing
 
-export parser.parser
-export parser.parse
+export parsing.parser
+export parsing.parse
 
 import parsing/tokenization
 

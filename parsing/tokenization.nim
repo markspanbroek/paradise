@@ -1,7 +1,7 @@
 import ./basics
 import ./grammar
 import ./input
-import ./parser
+import ./parsing
 
 type Peek[Token] = object
   next: ?!Token

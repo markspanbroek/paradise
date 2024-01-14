@@ -2,7 +2,7 @@ import ./basics
 import ./grammar
 import ./input
 import ./LL1
-import ./parser
+import ./parsing
 
 func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, definition: P) =
   var updating = false
