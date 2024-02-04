@@ -53,6 +53,7 @@ suite "parse characters":
     check x.parse("x") == success 1
     check x.parse("xx") == success 2
     check x.parse("xxx") == success 3
+    check x.parse("x".repeat(4000)) == success 4000
 
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)

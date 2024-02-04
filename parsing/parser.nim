@@ -4,59 +4,85 @@ import ./input
 import ./characters
 import ./tuples
 import ./LL1
+import ./automaton
 
-proc run(symbol: Symbol, input: Input)
-proc run(conversion: Conversion, input: Input)
-proc run[C: Concatenation](concatenation: C, input: Input)
-proc run(optional: Optional, input: Input)
-proc run(rule: Recursion, input: Input)
+
+
+proc step*[Token](symbol: Symbol, automaton: var Automaton[Token]): Step[Token]
+proc step*[Token](conversion: Conversion, automaton: var Automaton[Token]): Step[Token]
+proc step*[Token; C: Concatenation](concatenation: C, automaton: var Automaton[Token]): Step[Token]
+proc step*[Token](optional: Optional, automaton: var Automaton[Token]): Step[Token]
+proc step*[Token](rule: Recursion, automaton: var Automaton[Token]): Step[Token]
 
 proc parse*(grammar: Grammar, input: Input): auto =
-  grammar.run(input)
+  var automaton = Automaton.init(input)
+  automaton.todo.add(grammar.step(automaton))
+  automaton.run()
   result = grammar.output
   grammar.output.reset()
 
-proc run(symbol: Symbol, input: Input) =
+proc step*[Token](symbol: Symbol, automaton: var Automaton[Token]): Step[Token] =
   mixin category
-  let peek = input.peek()
-  without token =? peek:
-    symbol.output =  peek
-  if token.category in symbol.categories:
-    symbol.output = input.read()
-  else:
-    symbol.output = typeof(token).failure "expected: " & $symbol & " " & $input.location()
+  proc(automaton: var Automaton[Token]) =
+    let input = automaton.input
+    let peek = input.peek()
+    without token =? peek:
+      symbol.output =  peek
+    if token.category in symbol.categories:
+      symbol.output = input.read()
+    else:
+      let message = "expected: " & $symbol & " " & $input.location()
+      symbol.output = typeof(token).failure message
 
-proc run(conversion: Conversion, input: Input) =
-  conversion.output = conversion.operand.parse(input).map(conversion.convert)
+proc step*[Token](conversion: Conversion, automaton: var Automaton[Token]): Step[Token] =
+  proc convert(automaton: var Automaton[Token]) =
+    conversion.output = conversion.operand.output.map(conversion.convert)
+  proc(automaton: var Automaton[Token]) =
+    automaton.todo.add(convert)
+    automaton.todo.add(conversion.operand.step(automaton))
 
-proc run[C: Concatenation](concatenation: C, input: Input) =
+proc step*[Token; C: Concatenation](concatenation: C, automaton: var Automaton[Token]): Step[Token] =
   type Output = typeof(!concatenation.output)
-  without left =? concatenation.left.parse(input) and
-          right =? concatenation.right.parse(input), error:
-    concatenation.output = Output.failure error
-    return
-  when concatenation.left is Concatenation:
-    concatenation.output = success left & right
-  else:
-    concatenation.output = success (left, right)
+  proc between(automaton: var Automaton[Token]) =
+    without left =? concatenation.left.output, error:
+      concatenation.output = Output.failure error
+      return
+    proc after(automaton: var Automaton[Token]) =
+      without right =? concatenation.right.output, error:
+        concatenation.output = Output.failure error
+        return
+      when concatenation.left is Concatenation:
+        concatenation.output = success left & right
+      else:
+        concatenation.output = success (left, right)
+    automaton.todo.add(after)
+    automaton.todo.add(concatenation.right.step(automaton))
+  proc(automaton: var Automaton[Token]) =
+    automaton.todo.add(between)
+    automaton.todo.add(concatenation.left.step(automaton))
 
-proc run(optional: Optional, input: Input) =
+proc step*[Token](optional: Optional, automaton: var Automaton[Token]): Step[Token] =
   mixin category
   let operand = optional.operand
   type Output = typeof(!operand.output)
-  without peek =? input.peek(), error:
-    optional.output = failure(?Output, error)
-    return
-  if peek.category in operand.first:
-    without value =? operand.parse(input), error:
+  proc(automaton: var Automaton[Token]) =
+    let input = automaton.input
+    without peek =? input.peek(), error:
       optional.output = failure(?Output, error)
       return
-    optional.output = success some value
-  else:
-    optional.output = success none Output
+    if peek.category notin operand.first:
+      optional.output = success none Output
+      return
+    proc after(automaton: var Automaton[Token]) =
+      without value =? operand.output, error:
+        optional.output = failure(?Output, error)
+        return
+      optional.output = success some value
+    automaton.todo.add(after)
+    automaton.todo.add(operand.step(automaton))
 
-proc run(rule: Recursion, input: Input) =
-  rule.runClosure(input)
+proc step*[Token](rule: Recursion, automaton: var Automaton[Token]): Step[Token] =
+  rule.stepClosure(automaton)
 
 type Parser*[G] = object
   grammar: G

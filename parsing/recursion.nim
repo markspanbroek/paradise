@@ -1,7 +1,7 @@
 import ./basics
 import ./grammar
-import ./input
 import ./LL1
+import ./automaton
 import ./parser
 
 func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, definition: P) =
@@ -13,6 +13,10 @@ func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, defi
       rule.canBeEmpty = definition.canBeEmpty
       rule.first.incl(definition.first)
       updating = false
-  rule.runClosure = proc(input: Input[Token]) =
+  rule.stepClosure = proc(automaton: var Automaton[Token]): Step[Token] =
     bind basics.error
-    rule.output = definition.parse(input)
+    proc(automaton: var Automaton[Token]) =
+      proc after(automaton: var Automaton[Token]) =
+        rule.output = definition.output
+      automaton.todo.add(after)
+      automaton.todo.add(definition.step(automaton))

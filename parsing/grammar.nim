@@ -1,7 +1,7 @@
 import ./basics
 import ./characters
 import ./tuples
-import ./input
+import ./automaton
 
 type Grammar*[Token] = ref object of RootObj
 
@@ -74,7 +74,7 @@ func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
 
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
   updateClosure*: proc() {.noSideEffect.}
-  runClosure*: proc(input: Input[Token])
+  stepClosure*: proc(automaton: var Automaton[Token]): Step[Token]
   output*: ?!Output
 
 func recursive*(Token, Output: type): auto =
