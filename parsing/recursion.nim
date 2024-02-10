@@ -4,7 +4,7 @@ import ./LL1
 import ./automaton
 import ./parser
 
-func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, definition: P) =
+func define*[Token; G: Grammar[Token]](rule: Recursion, definition: G) =
   var updating = false
   rule.updateClosure = proc(again: var bool) =
     if not updating:
