@@ -8,6 +8,13 @@ type Grammar*[Token] = ref object of RootObj
 type Parslet*[Token, Category] = ref object of Grammar[Token]
   canBeEmpty*: bool
   first*: set[Category]
+  last*: HashSet[Parslet[Token, Category]]
+
+func hash*[Token, Category](parslet: Parslet[Token, Category]): Hash =
+  hash(addr parslet[])
+
+func `==`*[Token, Category](a, b: Parslet[Token, Category]): bool =
+  (addr a[]) == (addr b[])
 
 type Symbol*[Token, Category] = ref object of Parslet[Token, Category]
   categories*: set[Category]
