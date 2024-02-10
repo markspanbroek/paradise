@@ -1,14 +1,17 @@
 import ./input
 
 type
-  Automaton*[Token] = object
+  Automaton*[Token] = ref object
     input*: Input[Token]
-    todo*: seq[Step[Token]]
-  Step*[Token] = proc(automaton: var Automaton[Token])
+    todo: seq[proc()]
 
-proc init*[Token](_: type Automaton, input: Input[Token]): Automaton[Token] =
+proc new*[Token](_: type Automaton, input: Input[Token]): Automaton[Token] =
   Automaton[Token](input: input)
 
-proc run*(automaton: var Automaton) =
+proc add*(automaton: Automaton, step: proc()) =
+  automaton.todo.add(step)
+
+proc run*(automaton: Automaton) =
   while automaton.todo.len > 0:
-    automaton.todo.pop()(automaton)
+    let step = automaton.todo.pop()
+    step()
