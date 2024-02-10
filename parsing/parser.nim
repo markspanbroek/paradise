@@ -32,18 +32,18 @@ proc parse*(automaton: Automaton, symbol: Symbol) =
     symbol.output = typeof(token).failure message
 
 proc parse*(automaton: Automaton, conversion: Conversion) =
-  proc convert() =
+  proc assign() =
     conversion.output = conversion.operand.output.map(conversion.convert)
-  automaton.add(convert)
+  automaton.add(assign)
   automaton.parse(conversion.operand)
 
 proc parse*[C: Concatenation](automaton: Automaton, concatenation: C) =
   type Output = typeof(!concatenation.output)
-  proc between() =
+  proc next() =
     without left =? concatenation.left.output, error:
       concatenation.output = Output.failure error
       return
-    proc after() =
+    proc assign() =
       without right =? concatenation.right.output, error:
         concatenation.output = Output.failure error
         return
@@ -51,9 +51,9 @@ proc parse*[C: Concatenation](automaton: Automaton, concatenation: C) =
         concatenation.output = success left & right
       else:
         concatenation.output = success (left, right)
-    automaton.add(after)
+    automaton.add(assign)
     automaton.parse(concatenation.right)
-  automaton.add(between)
+  automaton.add(next)
   automaton.parse(concatenation.left)
 
 proc parse*(automaton: Automaton, optional: Optional) =
@@ -67,12 +67,12 @@ proc parse*(automaton: Automaton, optional: Optional) =
   if peek.category notin operand.first:
     optional.output = success none Output
     return
-  proc after() =
+  proc assign() =
     without value =? operand.output, error:
       optional.output = failure(?Output, error)
       return
     optional.output = success some value
-  automaton.add(after)
+  automaton.add(assign)
   automaton.parse(operand)
 
 proc parse*(automaton: Automaton, rule: Recursion) =
