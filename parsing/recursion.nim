@@ -6,14 +6,20 @@ import ./parser
 
 func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, definition: P) =
   var updating = false
-  rule.updateClosure = proc =
+  rule.updateClosure = proc(again: var bool) =
     if not updating:
       updating = true
       definition.update()
-      rule.canBeEmpty = definition.canBeEmpty
-      rule.first.incl(definition.first)
-      for item in definition.last.items:
-        rule.last.incl(item)
+      if not rule.canBeEmpty and definition.canBeEmpty:
+        rule.canBeEmpty = definition.canBeEmpty
+        again = true
+      if not (definition.first <= rule.first):
+        rule.first.incl(definition.first)
+        again = true
+      if not (definition.last <= rule.last):
+        for item in definition.last.items:
+          rule.last.incl(item)
+        again = true
       rule.last.incl(rule)
       updating = false
   rule.parseClosure = proc(automaton: Automaton[Token]) =

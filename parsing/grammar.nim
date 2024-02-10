@@ -9,6 +9,7 @@ type Parslet*[Token, Category] = ref object of Grammar[Token]
   canBeEmpty*: bool
   first*: set[Category]
   last*: HashSet[Parslet[Token, Category]]
+  follow*: set[Category]
 
 func hash*[Token, Category](parslet: Parslet[Token, Category]): Hash =
   hash(addr parslet[])
@@ -80,7 +81,7 @@ func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
   Optional[Token, Category, Operand, Output](operand: operand)
 
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
-  updateClosure*: proc() {.noSideEffect.}
+  updateClosure*: proc(again: var bool) {.noSideEffect.}
   parseClosure*: proc(automaton: Automaton[Token])
   output*: ?!Output
 

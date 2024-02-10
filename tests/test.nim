@@ -1,6 +1,7 @@
 import ./parsing/testDescription
 import ./parsing/testEmpty
 import ./parsing/testFirst
+import ./parsing/testFollow
 import ./parsing/testGrammar
 import ./parsing/testInput
 import ./parsing/testLast
