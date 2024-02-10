@@ -74,7 +74,7 @@ func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
 
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
   updateClosure*: proc() {.noSideEffect.}
-  addClosure*: proc(automaton: Automaton[Token])
+  parseClosure*: proc(automaton: Automaton[Token])
   output*: ?!Output
 
 func recursive*(Token, Output: type): auto =

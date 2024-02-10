@@ -13,9 +13,9 @@ func define*[Token, Category; P: Parslet[Token, Category]](rule: Recursion, defi
       rule.canBeEmpty = definition.canBeEmpty
       rule.first.incl(definition.first)
       updating = false
-  rule.addClosure = proc(automaton: Automaton[Token]) =
+  rule.parseClosure = proc(automaton: Automaton[Token]) =
     bind basics.error
     proc after() =
       rule.output = definition.output
     automaton.add(after)
-    automaton.add(definition)
+    automaton.parse(definition)
