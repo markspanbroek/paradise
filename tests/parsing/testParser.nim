@@ -39,6 +39,17 @@ suite "parse characters":
     check abcd.parse("abcd") == success ('a', 'b', 'c', 'd')
     check abcd.parse("abc").error.msg == "expected: 'd' (1, 4)"
 
+  test "concatenation of same parslet":
+    let letter = symbol({'a'..'z'})
+    let letters = letter & letter & letter
+    check letters.parse("abc") == success ('a', 'b', 'c')
+
+  test "concatenation of same concatenation":
+    let letter = symbol({'a'..'z'})
+    let letters = letter & letter
+    let concatenation = letters & letters
+    check concatenation.parse("abcd") == success ('a', 'b', 'c', 'd')
+
   test "optional":
     check (?symbol('a')).parse("a") == success some 'a'
     check (?symbol('a')).parse("") == success none char
