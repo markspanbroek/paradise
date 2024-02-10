@@ -7,6 +7,7 @@ export grammar.convert
 export grammar.`&`
 export grammar.`?`
 export grammar.recursive
+export grammar.`|`
 
 import parsing/recursion
 export recursion.define

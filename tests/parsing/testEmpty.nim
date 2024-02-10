@@ -43,3 +43,7 @@ suite "empty":
     let b = recursive ?char
     define b: ?symbol('b')
     check canBeEmpty b
+
+  test "alternatives":
+    check not canBeEmpty symbol('a') | symbol('b')
+    check canBeEmpty ?symbol('a') | ?symbol('b')

@@ -74,3 +74,19 @@ suite "last set":
     define a: (?(b & a)).convert(length)
     check CharParslet(a) in last(a)
     check CharParslet(b) in last(a)
+
+  test "alternatives":
+    let a = symbol('a')
+    let b = symbol('b')
+    let c = symbol('c')
+    let d = symbol('d')
+    let ab = a & b
+    let cd = c & d
+    let alternatives = ab | cd
+    check last(alternatives) == [
+      CharParslet(alternatives),
+      CharParslet(ab),
+      CharParslet(cd),
+      CharParslet(b),
+      CharParslet(d)
+    ].toHashSet

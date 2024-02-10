@@ -6,6 +6,7 @@ func update*(conversion: Conversion, again: var bool)
 func update*(concatenation: Concatenation, again: var bool)
 func update*(optional: Optional, again: var bool)
 func update*(rule: Recursion, again: var bool)
+func update*(alternatives: Alternatives, again: var bool)
 
 func update*(grammar: Grammar) =
   var again = false
@@ -57,3 +58,14 @@ func update*(optional: Optional, again: var bool) =
 
 func update*(rule: Recursion, again: var bool) =
   rule.updateClosure(again)
+
+func update*(alternatives: Alternatives, again: var bool) =
+  for choice in alternatives.choices.fields:
+    choice.update()
+    if choice.canBeEmpty:
+      alternatives.canBeEmpty = true
+    for item in choice.first.items:
+      alternatives.first.incl(item)
+    for item in choice.last.items:
+      alternatives.last.incl(item)
+  alternatives.last.incl(alternatives)

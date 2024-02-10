@@ -43,6 +43,10 @@ suite "first character set":
     define rule: (?rule & symbol('x')).convert(count)
     check first(rule) == {'x'}
 
+  test "alternatives":
+    check first((symbol('a') | symbol('b'))) == {'a', 'b'}
+    check first(((symbol('a') & symbol('b')) | (symbol('c') & symbol('d')))) == {'a', 'c'}
+
 suite "first token set":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -71,3 +75,7 @@ suite "first token set":
     proc count(parsed: (?int, LexerToken)): int = (parsed[0] |? 0) + 1
     define rule: (?rule & symbol(LexerToken, LexerCategory.number)).convert(count)
     check first(rule) == {LexerCategory.number}
+
+  test "alternatives":
+    check first(number | text) == {LexerCategory.number, LexerCategory.text}
+    check first((number & text) | (text & number)) == {LexerCategory.number, LexerCategory.text}

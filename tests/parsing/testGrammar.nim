@@ -30,6 +30,10 @@ suite "character grammars":
     let rule = recursive int
     check rule is Grammar[char]
 
+  test "alternatives":
+    check symbol('a') | symbol('b') is Grammar[char]
+    check ?symbol('a') | ?symbol('b') is Grammar[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -58,3 +62,7 @@ suite "token grammars":
   test "recursive rules":
     let rule = recursive(LexerToken, int)
     check rule is Grammar[LexerToken]
+
+  test "alternatives":
+    check number | text is Grammar[LexerToken]
+    check (number & text) | (text & number) is Grammar[LexerToken]

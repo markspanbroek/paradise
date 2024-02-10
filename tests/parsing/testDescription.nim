@@ -34,3 +34,7 @@ suite "grammar descriptions":
   test "optional":
     check $(?symbol('a')) == "'a'?"
     check $(?(symbol('x') & symbol('!'))) == "('x' & '!')?"
+
+  test "alternatives":
+    check $(symbol('a') | symbol('b')) == "('a' | 'b')"
+    check $(symbol('a') | symbol('b') | symbol('c') | symbol('d')) == "('a' | 'b' | 'c' | 'd')"

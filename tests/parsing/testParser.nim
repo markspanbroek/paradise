@@ -66,6 +66,30 @@ suite "parse characters":
     check x.parse("xxx") == success 3
     check x.parse("x".repeat(4000)) == success 4000
 
+  test "alternatives":
+    let alternatives = symbol('a') | symbol('b') | symbol('c')
+    check alternatives.parse("a") == success 'a'
+    check alternatives.parse("b") == success 'b'
+    check alternatives.parse("c") == success 'c'
+    check alternatives.parse("d").isFailure
+
+  test "optional alternatives":
+    let alternatives = (?symbol('a') & symbol('b')) | (?symbol('c') & symbol('d'))
+    check alternatives.parse("ab") == success (some 'a', 'b')
+    check alternatives.parse("cd") == success (some 'c', 'd')
+    check alternatives.parse("b") == success (none char, 'b')
+    check alternatives.parse("d") == success (none char, 'd')
+
+  test "alternative that can only be chosen by its follow set":
+    proc optionToInt(c: ?char): int = (c.?charToInt() |? -1)
+    let one = symbol('1').convert(charToInt)
+    let two = (?symbol('2')).convert(optionToInt)
+    let three = symbol('3').convert(charToInt)
+    let alternatives = (one | two) & three
+    check alternatives.parse("13") == success (1, 3)
+    check alternatives.parse("23") == success (2, 3)
+    check alternatives.parse("3") == success (-1, 3)
+
   test "iterative parsing":
     let parser = symbol({'0'..'9'}).convert(charToInt)
     let parsed = toSeq(parser.tokenize("123"))

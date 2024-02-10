@@ -11,6 +11,7 @@ proc parse*(automaton: Automaton, conversion: Conversion)
 proc parse*[C: Concatenation](automaton: Automaton, concatenation: C)
 proc parse*(automaton: Automaton, optional: Optional)
 proc parse*(automaton: Automaton, rule: Recursion)
+proc parse*(automaton: Automaton, alternatives: Alternatives)
 
 proc parse*(grammar: Grammar, input: Input): auto =
   var automaton = Automaton.new(input)
@@ -77,6 +78,26 @@ proc parse*(automaton: Automaton, optional: Optional) =
 
 proc parse*(automaton: Automaton, rule: Recursion) =
   rule.parseClosure(automaton)
+
+proc parse*(automaton: Automaton, alternatives: Alternatives) =
+  type Output = typeof(!alternatives.output)
+  let input = automaton.input
+  without peek =? input.peek(), error:
+    alternatives.output = failure(Output, error)
+    return
+  for choice in alternatives.choices.fields:
+    var first = choice.first
+    if choice.canBeEmpty:
+      for item in choice.follow.items:
+        first.incl(item)
+    if peek.category in first:
+      proc assign() =
+        alternatives.output = choice.output
+      automaton.add(assign)
+      automaton.parse(choice)
+      return
+  let message = "expected: " & $alternatives & " " & $input.location()
+  alternatives.output = Output.failure message
 
 type Parser*[G] = object
   grammar: G

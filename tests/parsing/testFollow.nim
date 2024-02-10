@@ -82,3 +82,15 @@ suite "follow set":
     define x: (?(x & symbol('x'))).convert(length)
     update(x)
     check x.follow == {'x'}
+
+  test "alternatives":
+    let a = symbol('a')
+    let b = symbol('b')
+    let c = symbol('c')
+    let alternatives = a | b
+    let concatenation = (alternatives & c)
+    concatenation.update()
+    check a.follow == {'c'}
+    check b.follow == {'c'}
+    check c.follow.len == 0
+    check alternatives.follow == {'c'}

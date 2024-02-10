@@ -69,6 +69,36 @@ func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, ri
     type Output = typeof((!left.output, !right.output))
   Concatenation[Token, Category, Left, Right, Output](left: left, right: right)
 
+type Alternatives*[Token, Category, Choices, Output] = ref object of Parslet[Token, Category]
+  choices*: Choices
+  output*: Output
+
+func `$`*(alternatives: Alternatives): string =
+  result &= "("
+  var first = true
+  for choice in alternatives.choices.fields:
+    if first:
+      first = false
+    else:
+      result &= " | "
+    result &= $choice
+  result &= ")"
+
+func `|`*[Token, Category; A, B: Parslet[Token, Category]](a: A, b: B): auto =
+  when typeof(a.output) is typeof(b.output):
+    type Output = typeof(b.output)
+  else:
+    when typeof(b.output) is typeof(a.output):
+      type Output = typeof(a.output)
+    else:
+      {.error: "output types do not match".}
+  when A is Alternatives:
+    type Choices = typeof(A.choices) & B
+    Alternatives[Token, Category, Choices, Output](choices: a.choices & b)
+  else:
+    type Choices = (A, B)
+    Alternatives[Token, Category, Choices, Output](choices: (a, b))
+
 type Optional*[Token, Category, Operand, Output] = ref object of Parslet[Token, Category]
   operand*: Operand
   output*: ?!Output
