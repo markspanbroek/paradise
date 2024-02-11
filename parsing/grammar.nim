@@ -72,7 +72,7 @@ func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, ri
 type Alternatives*[Token, Category, Choices, Output] = ref object of Parslet[Token, Category]
   choices*: Choices
   parseClosures*: array[Category.high, proc(automaton: Automaton[Token])]
-  output*: Output
+  output*: ?!Output
 
 func `$`*(alternatives: Alternatives): string =
   result &= "("
@@ -86,11 +86,11 @@ func `$`*(alternatives: Alternatives): string =
   result &= ")"
 
 func `|`*[Token, Category; A, B: Parslet[Token, Category]](a: A, b: B): auto =
-  when typeof(a.output) is typeof(b.output):
-    type Output = typeof(b.output)
+  when typeof(!a.output) is typeof(!b.output):
+    type Output = typeof(!b.output)
   else:
-    when typeof(b.output) is typeof(a.output):
-      type Output = typeof(a.output)
+    when typeof(!b.output) is typeof(!a.output):
+      type Output = typeof(!a.output)
     else:
       {.error: "output types do not match".}
   when A is Alternatives:
