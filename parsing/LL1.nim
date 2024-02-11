@@ -33,7 +33,6 @@ func update*(conversion: Conversion, again: var bool) =
   conversion.last.incl(conversion)
 
 func update*(concatenation: Concatenation, again: var bool) =
-  bind basics.items
   let left = concatenation.left
   let right = concatenation.right
   left.update()
@@ -98,7 +97,6 @@ func updateClosures[Choice](alternatives: Alternatives, choice: Choice) =
     alternatives.parseClosures[category.int] = parseChoice
 
 func update*(alternatives: Alternatives, again: var bool) =
-  bind basics.items
   for choice in alternatives.choices.fields:
     choice.update()
     alternatives.canBeEmpty = alternatives.canBeEmpty or choice.canBeEmpty
