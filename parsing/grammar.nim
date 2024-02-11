@@ -19,7 +19,7 @@ func `==`*[Token, Category](a, b: Parslet[Token, Category]): bool =
 
 type Symbol*[Token, Category] = ref object of Parslet[Token, Category]
   categories*: set[Category]
-  description*: string
+  description: string
   output*: ?!Token
 
 func `$`*(symbol: Symbol): string =
@@ -113,12 +113,25 @@ func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
   updateClosure*: proc(again: var bool) {.noSideEffect.}
   parseClosure*: proc(automaton: Automaton[Token])
+  description: string
   output*: ?!Output
 
-func recursive*(Token, Output: type): auto =
+func `$`*(rule: Recursion): string =
+  rule.description
+
+func recursive*(name: string, Token, Output: type): auto =
   mixin category
   type Category = typeof(Token.default.category)
-  Recursion[Token, Category, Output]()
+  Recursion[Token, Category, Output](description: name)
 
-func recursive*(Output: type): auto =
+func recursive*(name: string, Output: type): auto =
+  recursive(name, char, Output)
+
+var count: int
+
+proc recursive*(Token, Output: type): auto =
+  inc count
+  recursive("recursive" & $count, Token, Output)
+
+proc recursive*(Output: type): auto =
   recursive(char, Output)
