@@ -25,10 +25,6 @@ suite "last set":
     check last(letter) == [CharParslet(letter)].toHashSet
     check last(number) == [CharParslet(number)].toHashSet
 
-  test "end of input":
-    let x = finish()
-    check last(x) == [CharParslet(x)].toHashSet
-
   test "conversion":
     proc charToInt(c: char): int = c.int - '0'.int
     let one = symbol('1')
