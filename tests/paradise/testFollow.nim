@@ -1,8 +1,8 @@
 import std/unittest
 import pkg/questionable
-import parsing/grammar
-import parsing/LL1
-import parsing/recursion
+import paradise/grammar
+import paradise/LL1
+import paradise/recursion
 
 suite "follow set":
 

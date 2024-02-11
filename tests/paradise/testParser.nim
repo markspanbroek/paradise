@@ -4,8 +4,8 @@ import std/sequtils
 import std/os
 import pkg/questionable
 import pkg/questionable/results
-import parsing
-import parsing/input
+import paradise
+import paradise/input
 import ./examples/lexer
 import ./examples/conversion
 

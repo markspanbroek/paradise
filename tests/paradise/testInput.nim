@@ -1,8 +1,8 @@
 import std/unittest
 import std/strutils
 import std/os
-import parsing/basics
-import parsing/input
+import paradise/basics
+import paradise/input
 import ./examples/lexer
 
 suite "string input":

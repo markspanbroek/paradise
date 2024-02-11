@@ -1,9 +1,9 @@
 import std/unittest
 import std/sets
 import pkg/questionable
-import parsing/grammar
-import parsing/LL1
-import parsing/recursion
+import paradise/grammar
+import paradise/LL1
+import paradise/recursion
 
 proc last(grammar: Grammar): auto =
   update(grammar)

@@ -1,8 +1,8 @@
 import std/unittest
 import pkg/questionable
-import parsing/grammar
-import parsing/recursion
-import parsing/LL1
+import paradise/grammar
+import paradise/recursion
+import paradise/LL1
 import ./examples/conversion
 
 suite "empty":

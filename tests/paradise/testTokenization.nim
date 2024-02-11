@@ -1,7 +1,7 @@
 import std/unittest
 import std/strutils
 import pkg/questionable/results
-import parsing
+import paradise
 
 suite "tokenization":
 

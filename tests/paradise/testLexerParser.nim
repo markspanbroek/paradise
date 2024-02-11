@@ -1,7 +1,7 @@
 import std/unittest
 import std/sequtils
 import pkg/questionable/results
-import parsing
+import paradise
 import ./examples/lexer
 import ./examples/conversion
 

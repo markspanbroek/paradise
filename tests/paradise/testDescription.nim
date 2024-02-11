@@ -1,6 +1,6 @@
 import std/unittest
 import std/strutils
-import parsing/grammar
+import paradise/grammar
 import ./examples/lexer
 import ./examples/conversion
 

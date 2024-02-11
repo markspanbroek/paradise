@@ -1,5 +1,5 @@
 import std/unittest
-import parsing/grammar
+import paradise/grammar
 import ./examples/lexer
 import ./examples/conversion
 

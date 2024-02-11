@@ -1,13 +1,13 @@
-import ./parsing/testDescription
-import ./parsing/testEmpty
-import ./parsing/testFirst
-import ./parsing/testFollow
-import ./parsing/testGrammar
-import ./parsing/testInput
-import ./parsing/testLast
-import ./parsing/testLexerParser
-import ./parsing/testParser
-import ./parsing/testTokenization
-import ./parsing/testTuples
+import ./paradise/testDescription
+import ./paradise/testEmpty
+import ./paradise/testFirst
+import ./paradise/testFollow
+import ./paradise/testGrammar
+import ./paradise/testInput
+import ./paradise/testLast
+import ./paradise/testLexerParser
+import ./paradise/testParser
+import ./paradise/testTokenization
+import ./paradise/testTuples
 
 {.warning[UnusedImport]:off.}

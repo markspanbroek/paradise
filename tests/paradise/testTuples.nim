@@ -1,5 +1,5 @@
 import std/unittest
-import parsing/tuples
+import paradise/tuples
 
 suite "tuples":
 

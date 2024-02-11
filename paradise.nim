@@ -1,4 +1,4 @@
-import parsing/grammar
+import paradise/grammar
 
 export grammar.`$`
 export grammar.symbol
@@ -11,18 +11,18 @@ export grammar.`+`
 export grammar.recursive
 export grammar.`|`
 
-import parsing/recursion
+import paradise/recursion
 export recursion.define
 
-import parsing/parser
+import paradise/parser
 
 export parser.parser
 export parser.parse
 
-import parsing/tokenization
+import paradise/tokenization
 
 export tokenization.tokenize
 
-import parsing/input
+import paradise/input
 
 export input.items
