@@ -7,6 +7,8 @@ func update*(symbol: Symbol, again: var bool)
 func update*(conversion: Conversion, again: var bool)
 func update*(concatenation: Concatenation, again: var bool)
 func update*(optional: Optional, again: var bool)
+func update*(repetition: RepetitionStar, again: var bool)
+func update*(repetition: RepetitionPlus, again: var bool)
 func update*(rule: Recursion, again: var bool)
 func update*(alternatives: Alternatives, again: var bool)
 
@@ -56,6 +58,28 @@ func update*(optional: Optional, again: var bool) =
   optional.first.incl(operand.first)
   optional.last.incl(operand.last)
   optional.last.incl(optional)
+
+func update*(repetition: RepetitionStar, again: var bool) =
+  let operand = repetition.operand
+  operand.update()
+  repetition.canBeEmpty = true
+  repetition.first.incl(operand.first)
+  repetition.last.incl(operand.last)
+  repetition.last.incl(repetition)
+  for last in operand.last.items:
+    for first in operand.first:
+      last.follow.incl(first)
+
+func update*(repetition: RepetitionPlus, again: var bool) =
+  let operand = repetition.operand
+  operand.update()
+  repetition.canBeEmpty = operand.canBeEmpty
+  repetition.first.incl(operand.first)
+  repetition.last.incl(operand.last)
+  repetition.last.incl(repetition)
+  for last in operand.last.items:
+    for first in operand.first:
+      last.follow.incl(first)
 
 func update*(rule: Recursion, again: var bool) =
   rule.updateClosure(again)

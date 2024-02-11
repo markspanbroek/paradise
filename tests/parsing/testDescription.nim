@@ -36,6 +36,14 @@ suite "grammar descriptions":
     check $(?symbol('a')) == "'a'?"
     check $(?(symbol('x') & symbol('!'))) == "('x' & '!')?"
 
+  test "repetition *":
+    check $(*symbol('a')) == "'a'*"
+    check $(*(symbol('x') & symbol('!'))) == "('x' & '!')*"
+
+  test "repetition +":
+    check $(+symbol('a')) == "'a'+"
+    check $(+(symbol('x') & symbol('!'))) == "('x' & '!')+"
+
   test "recursive rule with name":
     check $recursive("foo", int) == "foo"
     check $recursive("bar", LexerToken, int) == "bar"

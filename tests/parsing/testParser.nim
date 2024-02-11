@@ -56,6 +56,18 @@ suite "parse characters":
     check (?symbol('a') & symbol('b')).parse("ab") == success (some 'a', 'b')
     check (?symbol('a') & symbol('b')).parse("b") == success (none char, 'b')
 
+  test "repetition *":
+    let repetition = *symbol({'0'..'9'}) & symbol('!')
+    check repetition.parse("!") == success ("", '!')
+    check repetition.parse("1!") == success ("1", '!')
+    check repetition.parse("42!") == success ("42", '!')
+
+  test "repetition +":
+    let repetition = +symbol({'0'..'9'}) & symbol('!')
+    check repetition.parse("!").isFailure
+    check repetition.parse("1!") == success ("1", '!')
+    check repetition.parse("42!") == success ("42", '!')
+
   test "recursive rules":
     let x = recursive int
     proc length(parsed: ?(char, int)): int = (parsed.?[1] + 1) |? 0
@@ -160,6 +172,23 @@ suite "parse tokens":
     check (?number).parse(@[]) == success none LexerToken
     check (?number & text).parse(@[token1, tokenA]) == success (some token1, tokenA)
     check (?number & text).parse(@[tokenA]) == success (none LexerToken, tokenA)
+
+  test "repetition *":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let text = symbol(LexerToken, LexerCategory.text)
+    let repetition = *number & text
+    let empty = seq[LexerToken].default
+    check repetition.parse(@[tokenA]) == success (empty, tokenA)
+    check repetition.parse(@[token1, tokenA]) == success (@[token1], tokenA)
+    check repetition.parse(@[token1, token2, tokenA]) == success (@[token1, token2], tokenA)
+
+  test "repetition +":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let text = symbol(LexerToken, LexerCategory.text)
+    let repetition = +number & text
+    check repetition.parse(@[tokenA]).isFailure
+    check repetition.parse(@[token1, tokenA]) == success (@[token1], tokenA)
+    check repetition.parse(@[token1, token2, tokenA]) == success (@[token1, token2], tokenA)
 
   test "recursive rules":
     let numbers = recursive(LexerToken, int)

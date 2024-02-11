@@ -9,6 +9,8 @@ proc parse*(automaton: Automaton, symbol: Symbol)
 proc parse*(automaton: Automaton, conversion: Conversion)
 proc parse*[C: Concatenation](automaton: Automaton, concatenation: C)
 proc parse*(automaton: Automaton, optional: Optional)
+proc parse*(automaton: Automaton, repetition: RepetitionStar)
+proc parse*(automaton: Automaton, repetition: RepetitionPlus)
 proc parse*(automaton: Automaton, rule: Recursion)
 proc parse*(automaton: Automaton, alternatives: Alternatives)
 
@@ -73,6 +75,53 @@ proc parse*(automaton: Automaton, optional: Optional) =
       return
     optional.output = success some value
   automaton.add(assign)
+  automaton.parse(operand)
+
+proc parse*(automaton: Automaton, repetition: RepetitionStar) =
+  type Output = typeof(!repetition.output)
+  let operand = repetition.operand
+  let input = automaton.input
+  var output: Output
+  proc next()
+  proc append() =
+    without value =? operand.output, error:
+      repetition.output = failure(Output, error)
+      return
+    output.add(value)
+    next()
+  proc next() =
+    without peek =? input.peek(), error:
+      repetition.output = failure(Output, error)
+      return
+    if peek.category notin operand.first:
+      repetition.output = success output
+      return
+    automaton.add(append)
+    automaton.parse(operand)
+  next()
+
+proc parse*(automaton: Automaton, repetition: RepetitionPlus) =
+  type Output = typeof(!repetition.output)
+  let operand = repetition.operand
+  let input = automaton.input
+  var output: Output
+  proc next()
+  proc append() =
+    without value =? operand.output, error:
+      repetition.output = failure(Output, error)
+      return
+    output.add(value)
+    next()
+  proc next() =
+    without peek =? input.peek(), error:
+      repetition.output = failure(Output, error)
+      return
+    if peek.category notin operand.first:
+      repetition.output = success output
+      return
+    automaton.add(append)
+    automaton.parse(operand)
+  automaton.add(append)
   automaton.parse(operand)
 
 proc parse*(automaton: Automaton, rule: Recursion) =

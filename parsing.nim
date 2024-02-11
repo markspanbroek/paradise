@@ -6,6 +6,8 @@ export grammar.finish
 export grammar.convert
 export grammar.`&`
 export grammar.`?`
+export grammar.`*`
+export grammar.`+`
 export grammar.recursive
 export grammar.`|`
 

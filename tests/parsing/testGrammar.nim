@@ -34,6 +34,14 @@ suite "character grammars":
     check symbol('a') | symbol('b') is Grammar[char]
     check ?symbol('a') | ?symbol('b') is Grammar[char]
 
+  test "repetition *":
+    check *symbol('a') is Grammar[char]
+    check *(symbol({'0'..'9'}) & symbol('!')) is Grammar[char]
+
+  test "repetition +":
+    check +symbol('a') is Grammar[char]
+    check +(symbol({'0'..'9'}) & symbol('!')) is Grammar[char]
+
 suite "token grammars":
 
   let number = symbol(LexerToken, LexerCategory.number)
@@ -66,3 +74,11 @@ suite "token grammars":
   test "alternatives":
     check number | text is Grammar[LexerToken]
     check (number & text) | (text & number) is Grammar[LexerToken]
+
+  test "repetition *":
+    check *number is Grammar[LexerToken]
+    check *(number & text) is Grammar[LexerToken]
+
+  test "repetition +":
+    check +number is Grammar[LexerToken]
+    check +(number & text) is Grammar[LexerToken]

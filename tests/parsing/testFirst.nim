@@ -30,6 +30,17 @@ suite "first character set":
     check first((?symbol('a'))) == {'a'}
     check first(?(symbol('a') & symbol('b'))) == {'a'}
 
+  test "repetition *":
+    check first(*symbol('a')) == {'a'}
+    check first(*symbol('a') & symbol('b')) == {'a', 'b'}
+    check first(*symbol('a') & symbol('b') & symbol('c')) == {'a', 'b'}
+    check first(*symbol('a') & *symbol('b') & symbol('c')) == {'a', 'b', 'c'}
+
+  test "repetition +":
+    check first((+symbol('a'))) == {'a'}
+    check first((+symbol('a') & symbol('b'))) == {'a'}
+    check first((+(symbol('a') & symbol('b')))) == {'a'}
+
   test "concatenation":
     check first(symbol('a') & symbol('b')) == {'a'}
     check first(symbol({'0'..'9'}) & symbol('!')) == {'0'..'9'}
@@ -65,6 +76,15 @@ suite "first token set":
 
   test "conversion":
     check first(number.convert(tokenToString)) == {LexerCategory.number}
+
+  test "repetition *":
+    check first(*number) == {LexerCategory.number}
+    check first(*number & text) == {LexerCategory.number, LexerCategory.text}
+
+  test "repetition +":
+    check first(+number) == {LexerCategory.number}
+    check first(+number & text) == {LexerCategory.number}
+    check first(+(number & text)) == {LexerCategory.number}
 
   test "concatenation":
     check first(number & text) == {LexerCategory.number}

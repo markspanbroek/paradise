@@ -111,6 +111,34 @@ func `?`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
   type Output = ?typeof(!operand.output)
   Optional[Token, Category, Operand, Output](operand: operand)
 
+type RepetitionStar*[Token, Category, Operand, Output] = ref object of Parslet[Token, Category]
+  operand*: Operand
+  output*: ?!Output
+
+func `$`*(optional: RepetitionStar): string =
+  $optional.operand & "*"
+
+func `*`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand): auto =
+  when typeof(!operand.output) is char:
+    type Output = string
+  else:
+    type Output = seq[typeof(!operand.output)]
+  RepetitionStar[Token, Category, Operand, Output](operand: operand)
+
+type RepetitionPlus*[Token, Category, Operand, Output] = ref object of Parslet[Token, Category]
+  operand*: Operand
+  output*: ?!Output
+
+func `$`*(optional: RepetitionPlus): string =
+  $optional.operand & "+"
+
+func `+`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand): auto =
+  when typeof(!operand.output) is char:
+    type Output = string
+  else:
+    type Output = seq[typeof(!operand.output)]
+  RepetitionPlus[Token, Category, Operand, Output](operand: operand)
+
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
   updateClosure*: proc(again: var bool) {.noSideEffect.}
   parseClosure*: proc(automaton: Automaton[Token])

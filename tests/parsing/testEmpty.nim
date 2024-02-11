@@ -47,3 +47,11 @@ suite "empty":
   test "alternatives":
     check not canBeEmpty symbol('a') | symbol('b')
     check canBeEmpty ?symbol('a') | ?symbol('b')
+
+  test "repetition *":
+    check canBeEmpty(*symbol('a'))
+    check canBeEmpty(*(symbol('a') & symbol('b')))
+
+  test "repetition +":
+    check not canBeEmpty(+symbol('a'))
+    check canBeEmpty(+(?symbol('a')))

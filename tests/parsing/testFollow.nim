@@ -76,6 +76,30 @@ suite "follow set":
     check c.follow.len == 0
     check optional.follow == {'c'}
 
+  test "repetition *":
+    let a = symbol('a')
+    let b = symbol('b')
+    let c = symbol('c')
+    let repetition = *b
+    let concatenation = (a & repetition & c)
+    concatenation.update()
+    check a.follow == {'b', 'c'}
+    check b.follow == {'b', 'c'}
+    check c.follow.len == 0
+    check repetition.follow == {'c'}
+
+  test "repetition +":
+    let a = symbol('a')
+    let b = symbol('b')
+    let c = symbol('c')
+    let repetition = +b
+    let concatenation = (a & repetition & c)
+    concatenation.update()
+    check a.follow == {'b'}
+    check b.follow == {'b','c'}
+    check c.follow.len == 0
+    check repetition.follow == {'c'}
+
   test "recursive rules":
     let x = recursive int
     proc length(parsed: ?(int, char)): int = (parsed.?[0] |? 0) + 1

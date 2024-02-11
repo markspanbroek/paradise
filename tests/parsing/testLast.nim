@@ -46,6 +46,22 @@ suite "last set":
       CharParslet(a)
     ].toHashSet
 
+  test "repetition *":
+    let a = symbol('a')
+    let repetition = *a
+    check last(repetition) == [
+      CharParslet(repetition),
+      CharParslet(a)
+    ].toHashSet
+
+  test "repetition +":
+    let a = symbol('a')
+    let repetition = +a
+    check last(repetition) == [
+      CharParslet(repetition),
+      CharParslet(a)
+    ].toHashSet
+
   test "concatenation":
     let a = symbol('a')
     let b = symbol('b')
