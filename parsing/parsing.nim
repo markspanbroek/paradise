@@ -84,8 +84,7 @@ proc parse*(automaton: Automaton, alternatives: Alternatives) =
   without peek =? input.peek(), error:
     alternatives.output = failure(Output, error)
     return
-  let closure = alternatives.parseClosures[peek.category.int]
-  if closure == nil:
+  without closure =? alternatives.parseClosures[peek.category.int]:
     let message = "expected: " & $alternatives & " " & $input.location()
     alternatives.output = Output.failure message
     return
