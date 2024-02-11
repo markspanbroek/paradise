@@ -1,5 +1,6 @@
 import std/unittest
 import std/strutils
+import std/os
 import parsing/basics
 import parsing/input
 import ./examples/lexer
@@ -96,3 +97,51 @@ suite "token sequence input":
     check readUntilError(@[]).msg.contains("(0, 0)")
     check readUntilError(@[token1, token2]).msg.contains("(0, 2)")
     check readUntilError(@[token1, token2, tokenA]).msg.contains("(0, 3)")
+
+suite "file input":
+
+  var input: Input[char]
+  var file: File
+
+  setup:
+    file = open(currentSourcePath.parentDir / "examples" / "abc.txt", fmRead)
+    input = Input.new(file, bufferSize = 2)
+
+  teardown:
+    file.close()
+
+  test "reads one character at a time":
+    check input.read() == success 'a'
+    check input.read() == success 'b'
+    check input.read() == success 'c'
+
+  test "reads a zero character at end of file":
+    for _ in 0..<3: discard input.read()
+    check input.read() == success '\0'
+
+  test "fails when reading beyond end of file":
+    for _ in 0..<3: discard input.read()
+    check input.read() == success '\0'
+    let failure = input.read()
+    check failure.isFailure
+    check failure.error.msg.contains("reading beyond end of input")
+
+  test "peeks ahead at the next character":
+    check input.peek() == success 'a'
+    check input.peek() == success 'a'
+    check input.read() == success 'a'
+    check input.peek() == success 'b'
+    check input.read() == success 'b'
+    check input.peek() == success 'c'
+    check input.read() == success 'c'
+    check input.peek() == success '\0'
+    check input.read() == success '\0'
+    check input.peek().isFailure
+
+  test "errors include line and column location":
+    proc readUntilError(input: Input[char]): ref CatchableError =
+      var outcome = input.read()
+      while outcome.isSuccess:
+        outcome = input.read()
+      outcome.error
+    check readUntilError(input).msg.contains("(1, 4)")

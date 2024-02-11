@@ -19,5 +19,8 @@ proc parse*[G: Grammar[char]](parser: Parser[G], input: string): auto =
 proc parse*[Token; G: Grammar[Token]](parser: Parser[G], input: seq[Token]): auto =
   parser.parse(Input.new(input))
 
+proc parse*[G: Grammar[char]](parser: Parser[G], input: File): auto =
+  parser.parse(Input.new(input))
+
 template parse*(grammar: Grammar, input: untyped): auto =
   grammar.parser.parse(input)

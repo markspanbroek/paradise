@@ -1,6 +1,7 @@
 import std/unittest
 import std/strutils
 import std/sequtils
+import std/os
 import pkg/questionable
 import pkg/questionable/results
 import parsing
@@ -221,3 +222,11 @@ suite "parse tokens":
       discard input.read()
     let error = grammar.parse(input).error
     check error.msg.contains("(0, 2)")
+
+suite "parsing files":
+
+  test "parses file input":
+    let file = open(currentSourcePath.parentDir / "examples" / "abc.txt", fmRead)
+    let grammar = +symbol({'a'..'z'}) & finish()
+    check grammar.parse(file) == success ("abc", '\0')
+    file.close()
