@@ -1,5 +1,7 @@
 import ./basics
 import ./grammar
+import ./parsing
+import ./automaton
 
 func update*(symbol: Symbol, again: var bool)
 func update*(conversion: Conversion, again: var bool)
@@ -59,6 +61,19 @@ func update*(optional: Optional, again: var bool) =
 func update*(rule: Recursion, again: var bool) =
   rule.updateClosure(again)
 
+func updateClosures[Choice](alternatives: Alternatives, choice: Choice) =
+  bind basics.error
+  proc assign() =
+    alternatives.output = choice.output
+  proc parseChoice(automaton: Automaton[Alternatives.Token]) =
+    automaton.add(assign)
+    automaton.parse(choice)
+  var categories = choice.first
+  if choice.canBeEmpty:
+    categories.incl(choice.follow)
+  for category in categories:
+    alternatives.parseClosures[category.int] = parseChoice
+
 func update*(alternatives: Alternatives, again: var bool) =
   for choice in alternatives.choices.fields:
     choice.update()
@@ -68,4 +83,5 @@ func update*(alternatives: Alternatives, again: var bool) =
       alternatives.first.incl(item)
     for item in choice.last.items:
       alternatives.last.incl(item)
+    alternatives.updateClosures(choice)
   alternatives.last.incl(alternatives)

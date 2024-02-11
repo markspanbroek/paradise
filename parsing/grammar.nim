@@ -71,6 +71,7 @@ func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, ri
 
 type Alternatives*[Token, Category, Choices, Output] = ref object of Parslet[Token, Category]
   choices*: Choices
+  parseClosures*: array[Category.high, proc(automaton: Automaton[Token])]
   output*: Output
 
 func `$`*(alternatives: Alternatives): string =

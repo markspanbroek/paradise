@@ -2,7 +2,7 @@ import ./basics
 import ./grammar
 import ./LL1
 import ./automaton
-import ./parser
+import ./parsing
 
 func define*[Token; G: Grammar[Token]](rule: Recursion, definition: G) =
   var updating = false
