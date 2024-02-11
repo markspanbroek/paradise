@@ -104,7 +104,7 @@ suite "file input":
   var file: File
 
   setup:
-    file = open(currentSourcePath.parentDir / "examples" / "abc.txt", fmRead)
+    file = open(currentSourcePath.parentDir / "examples" / "abc.txt")
     input = Input.new(file, bufferSize = 2)
 
   teardown:

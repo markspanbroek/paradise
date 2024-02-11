@@ -226,7 +226,7 @@ suite "parse tokens":
 suite "parsing files":
 
   test "parses file input":
-    let file = open(currentSourcePath.parentDir / "examples" / "abc.txt", fmRead)
+    let file = open(currentSourcePath.parentDir / "examples" / "abc.txt")
     let grammar = +symbol({'a'..'z'}) & finish()
     check grammar.parse(file) == success ("abc", '\0')
     file.close()
