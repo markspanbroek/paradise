@@ -22,40 +22,39 @@ func update*(symbol: Symbol, again: var bool) =
   symbol.last.incl(symbol)
 
 func update*(conversion: Conversion, again: var bool) =
+  bind basics.items
   let operand = conversion.operand
   operand.update()
   conversion.canBeEmpty = operand.canBeEmpty
   conversion.first.incl(operand.first)
-  for item in operand.last.items:
-    conversion.last.incl(item)
+  conversion.last.incl(operand.last)
   conversion.last.incl(conversion)
 
 func update*(concatenation: Concatenation, again: var bool) =
+  bind basics.items
   let left = concatenation.left
   let right = concatenation.right
   left.update()
   right.update()
   concatenation.canBeEmpty = left.canBeEmpty and right.canBeEmpty
   concatenation.first.incl(left.first)
-  for item in right.last.items:
-    concatenation.last.incl(item)
+  concatenation.last.incl(right.last)
   if left.canBeEmpty:
     concatenation.first.incl(right.first)
   if right.canBeEmpty:
-    for item in left.last.items:
-      concatenation.last.incl(item)
+    concatenation.last.incl(left.last)
   concatenation.last.incl(concatenation)
   for last in left.last.items:
     for first in right.first:
       last.follow.incl(first)
 
 func update*(optional: Optional, again: var bool) =
+  bind basics.items
   let operand = optional.operand
   operand.update()
   optional.canBeEmpty = true
   optional.first.incl(operand.first)
-  for item in operand.last.items:
-    optional.last.incl(item)
+  optional.last.incl(operand.last)
   optional.last.incl(optional)
 
 func update*(rule: Recursion, again: var bool) =
@@ -75,13 +74,11 @@ func updateClosures[Choice](alternatives: Alternatives, choice: Choice) =
     alternatives.parseClosures[category.int] = parseChoice
 
 func update*(alternatives: Alternatives, again: var bool) =
+  bind basics.items
   for choice in alternatives.choices.fields:
     choice.update()
-    if choice.canBeEmpty:
-      alternatives.canBeEmpty = true
-    for item in choice.first.items:
-      alternatives.first.incl(item)
-    for item in choice.last.items:
-      alternatives.last.incl(item)
+    alternatives.canBeEmpty = alternatives.canBeEmpty or choice.canBeEmpty
+    alternatives.first.incl(choice.first)
+    alternatives.last.incl(choice.last)
     alternatives.updateClosures(choice)
   alternatives.last.incl(alternatives)

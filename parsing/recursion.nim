@@ -17,8 +17,7 @@ func define*[Token; G: Grammar[Token]](rule: Recursion, definition: G) =
         rule.first.incl(definition.first)
         again = true
       if not (definition.last <= rule.last):
-        for item in definition.last.items:
-          rule.last.incl(item)
+        rule.last.incl(definition.last)
         again = true
       rule.last.incl(rule)
       updating = false
