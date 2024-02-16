@@ -28,7 +28,7 @@ suite "last set":
   test "conversion":
     proc charToInt(c: char): int = c.int - '0'.int
     let one = symbol('1')
-    let conversion = one.convert(charToInt)
+    let conversion = one >> charToInt
     check last(conversion) == [
       CharParslet(conversion),
       CharParslet(one)
@@ -83,7 +83,7 @@ suite "last set":
     let a = recursive int
     let b = symbol('b')
     proc length(parsed: ?(char, int)): int = (parsed.?[1] |? 0) + 1
-    define a: (?(b & a)).convert(length)
+    define a: ?(b & a) >> length
     check CharParslet(a) in last(a)
     check CharParslet(b) in last(a)
 

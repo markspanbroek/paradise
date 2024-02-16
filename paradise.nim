@@ -2,7 +2,7 @@ import paradise/grammar
 export grammar.`$`
 export grammar.symbol
 export grammar.finish
-export grammar.convert
+export grammar.`>>`
 export grammar.`&`
 export grammar.`?`
 export grammar.`*`

@@ -51,7 +51,7 @@ type
 func `$`*(conversion: Conversion): string =
   $conversion.operand
 
-func convert*[Token, Category; Operand: Parslet[Token, Category], From, To](operand: Operand, convert: Converter[From, To]): auto =
+func `>>`*[Token, Category; Operand: Parslet[Token, Category], From, To](operand: Operand, convert: Converter[From, To]): auto =
   Conversion[Token, Category, Operand, From, To](operand: operand, convert: convert)
 
 type Concatenation*[Token, Category, Left, Right, Output] = ref object of Parslet[Token, Category]

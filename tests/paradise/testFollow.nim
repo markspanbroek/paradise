@@ -43,8 +43,8 @@ suite "follow set":
     proc charToInt(c: char): int = c.int - '0'.int
     let one = symbol('1')
     let two = symbol('2')
-    let oneInt = one.convert(charToInt)
-    let twoInt = two.convert(charToInt)
+    let oneInt = one >> charToInt
+    let twoInt = two >> charToInt
     let concatenation = (oneInt & twoInt)
     concatenation.update()
     check one.follow == {'2'}
@@ -103,7 +103,7 @@ suite "follow set":
   test "recursive rules":
     let x = recursive int
     proc length(parsed: ?(int, char)): int = (parsed.?[0] |? 0) + 1
-    define x: (?(x & symbol('x'))).convert(length)
+    define x: ?(x & symbol('x')) >> length
     update(x)
     check x.follow == {'x'}
 

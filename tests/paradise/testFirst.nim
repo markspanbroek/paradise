@@ -24,7 +24,7 @@ suite "first character set":
     check first(finish()) == {'\0'}
 
   test "conversion":
-    check first(symbol({'0'..'9'}).convert(charToInt)) == {'0'..'9'}
+    check first(symbol({'0'..'9'}) >> charToInt) == {'0'..'9'}
 
   test "optional":
     check first((?symbol('a'))) == {'a'}
@@ -51,7 +51,7 @@ suite "first character set":
   test "recursive rules":
     let rule = recursive int
     proc count(parsed: (?int, char)): int = (parsed[0] |? 0) + 1
-    define rule: (?rule & symbol('x')).convert(count)
+    define rule: ?rule & symbol('x') >> count
     check first(rule) == {'x'}
 
   test "alternatives":
@@ -75,7 +75,7 @@ suite "first token set":
     check first(finish(LexerToken)) == {LexerCategory.endOfInput}
 
   test "conversion":
-    check first(number.convert(tokenToString)) == {LexerCategory.number}
+    check first(number >> tokenToString) == {LexerCategory.number}
 
   test "repetition *":
     check first(*number) == {LexerCategory.number}
@@ -93,7 +93,7 @@ suite "first token set":
   test "recursive rules":
     let rule = recursive(LexerToken, int)
     proc count(parsed: (?int, LexerToken)): int = (parsed[0] |? 0) + 1
-    define rule: (?rule & symbol(LexerToken, LexerCategory.number)).convert(count)
+    define rule: ?rule & symbol(LexerToken, LexerCategory.number) >> count
     check first(rule) == {LexerCategory.number}
 
   test "alternatives":

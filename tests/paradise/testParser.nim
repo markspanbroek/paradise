@@ -26,8 +26,8 @@ suite "parse characters":
     check finish().parse("a").isFailure
 
   test "conversion":
-    check symbol({'0'..'9'}).convert(charToInt).parse("5") == success 5
-    check symbol({'0'..'9'}).convert(charToInt).parse("a").isFailure
+    check (symbol({'0'..'9'}) >> charToInt).parse("5") == success 5
+    check (symbol({'0'..'9'}) >> charToInt).parse("a").isFailure
 
   test "concatenation":
     let ab = symbol('a') & symbol('b')
@@ -72,7 +72,7 @@ suite "parse characters":
   test "recursive rules":
     let x = recursive int
     proc length(parsed: ?(char, int)): int = (parsed.?[1] + 1) |? 0
-    define x: (?(symbol('x') & x)).convert(length)
+    define x: ?(symbol('x') & x) >> length
     check x.parse("") == success 0
     check x.parse("x") == success 1
     check x.parse("xx") == success 2
@@ -95,21 +95,21 @@ suite "parse characters":
 
   test "alternative that can only be chosen by its follow set":
     proc optionToInt(c: ?char): int = (c.?charToInt() |? -1)
-    let one = symbol('1').convert(charToInt)
-    let two = (?symbol('2')).convert(optionToInt)
-    let three = symbol('3').convert(charToInt)
+    let one = symbol('1') >> charToInt
+    let two = ?symbol('2') >> optionToInt
+    let three = symbol('3') >> charToInt
     let alternatives = (one | two) & three
     check alternatives.parse("13") == success (1, 3)
     check alternatives.parse("23") == success (2, 3)
     check alternatives.parse("3") == success (-1, 3)
 
   test "iterative parsing":
-    let parser = symbol({'0'..'9'}).convert(charToInt)
+    let parser = symbol({'0'..'9'}) >> charToInt
     let parsed = toSeq(parser.tokenize("123"))
     check parsed == @[success 1, success 2, success 3]
 
   test "iterative parsing stops on error":
-    let parser = symbol({'0'..'9'}).convert(charToInt)
+    let parser = symbol({'0'..'9'}) >> charToInt
     let parsed = toSeq(parser.tokenize("12x3"))
     check parsed.len == 3
     check parsed[0] == success 1
@@ -152,7 +152,7 @@ suite "parse tokens":
     check finish(LexerToken).parse(@[token1]).isFailure
 
   test "conversion":
-    let text = symbol(LexerToken, LexerCategory.text).convert(tokenToString)
+    let text = symbol(LexerToken, LexerCategory.text) >> tokenToString
     let tokenAbc = LexerToken(category: text, value: "abc")
     let token123 = LexerToken(category: number, value: "123")
     check text.parse(@[tokenAbc]) == success "abc"
@@ -195,7 +195,7 @@ suite "parse tokens":
     let numbers = recursive(LexerToken, int)
     let number = symbol(LexerToken, LexerCategory.number)
     proc length(parsed: ?(LexerToken, int)): int = (parsed.?[1] + 1) |? 0
-    define numbers: (?(number & numbers)).convert(length)
+    define numbers: ?(number & numbers) >> length
     check numbers.parse(@[]) == success 0
     check numbers.parse(@[token1]) == success 1
     check numbers.parse(@[token1, token2]) == success 2
@@ -203,13 +203,13 @@ suite "parse tokens":
 
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})
-    let parser = number.convert(tokenToString)
+    let parser = number >> tokenToString
     let parsed = toSeq(parser.tokenize(@[token1, token2]))
     check parsed == @[success "1", success "2"]
 
   test "iterative parsing stops on error":
     let number = symbol(LexerToken, {LexerCategory.number})
-    let parser = number.convert(tokenToString)
+    let parser = number >> tokenToString
     let parsed = toSeq(parser.tokenize(@[token1, tokenA, token2]))
     check parsed.len == 2
     check parsed[0] == success "1"

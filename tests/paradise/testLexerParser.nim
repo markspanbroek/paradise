@@ -12,8 +12,8 @@ suite "lexer and parser":
     proc digitToLexerToken(digit: char): LexerToken =
       LexerToken(category: LexerCategory.number, value: $digit)
 
-    let lexer = symbol({'0'..'9'}).convert(digitToLexerToken)
-    let parser = symbol(LexerToken, LexerCategory.number).convert(tokenToString)
+    let lexer = symbol({'0'..'9'}) >> digitToLexerToken
+    let parser = symbol(LexerToken, LexerCategory.number) >> tokenToString
 
     let parsed = toSeq parser.tokenize(lexer.tokenize("123"))
     check parsed == @[success "1", success "2", success "3"]

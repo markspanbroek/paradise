@@ -17,7 +17,7 @@ suite "character grammars":
     check finish() is Grammar[char]
 
   test "conversion":
-    check symbol({'0'..'9'}).convert(charToInt) is Grammar[char]
+    check symbol({'0'..'9'}) >> charToInt is Grammar[char]
 
   test "concatenation":
     check symbol('a') & symbol('b') is Grammar[char]
@@ -58,7 +58,7 @@ suite "token grammars":
     check finish(LexerToken) is Grammar[LexerToken]
 
   test "conversion":
-    check number.convert(tokenToString) is Grammar[LexerToken]
+    check number >> tokenToString is Grammar[LexerToken]
 
   test "concatenation":
     check number & text is Grammar[LexerToken]

@@ -32,8 +32,8 @@ suite "empty":
     check not canBeEmpty(symbol('a') & symbol('b'))
 
   test "conversion":
-    check canBeEmpty((?symbol('5')).convert(charToInt))
-    check not canBeEmpty(symbol('5').convert(charToInt))
+    check canBeEmpty(?symbol('5') >> charToInt)
+    check not canBeEmpty(symbol('5') >> charToInt)
 
   test "recursive rules":
     let a = recursive char
