@@ -26,7 +26,8 @@ proc parse*(automaton: Automaton, symbol: Symbol) =
   let input = automaton.input
   let peek = input.peek()
   without token =? peek:
-    symbol.output =  peek
+    symbol.output = peek
+    return
   if token.category in symbol.categories:
     symbol.output = input.read()
   else:
