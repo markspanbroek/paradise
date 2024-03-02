@@ -11,11 +11,11 @@ macro concatenate(a: tuple, b: tuple, lenA, lenB: static int): auto =
       `b`[`i`]
   c
 
-func `&`*[A: tuple, B: tuple](a: A, b: B): auto =
+func `&&`*[A: tuple, B: tuple](a: A, b: B): auto =
   concatenate(a, b, tupleLen(a), tupleLen(b))
 
-func `&`*[A: tuple, B: not tuple](a: A, b: B): auto =
+func `&&`*[A: tuple, B: not tuple](a: A, b: B): auto =
   concatenate(a, (b,), tupleLen(a), 1)
 
-template `&`*(A: type tuple, B: type): auto =
-  typeof(A.default & B.default)
+template `&&`*(A: type tuple, B: type): auto =
+  typeof(A.default && B.default)

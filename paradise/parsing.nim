@@ -51,7 +51,7 @@ proc parse*[C: Concatenation](automaton: Automaton, concatenation: C) =
         concatenation.output = Output.failure error
         return
       when concatenation.left is Concatenation:
-        concatenation.output = success left & right
+        concatenation.output = success left && right
       else:
         concatenation.output = success (left, right)
     automaton.add(assign)

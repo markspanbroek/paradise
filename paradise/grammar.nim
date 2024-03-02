@@ -64,7 +64,7 @@ func `$`*(concatenation: Concatenation): string =
 
 func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, right: Right): auto =
   when Left is Concatenation:
-    type Output = typeof(!left.output & !right.output)
+    type Output = typeof(!left.output && !right.output)
   else:
     type Output = typeof((!left.output, !right.output))
   Concatenation[Token, Category, Left, Right, Output](left: left, right: right)
@@ -94,8 +94,8 @@ func `|`*[Token, Category; A, B: Parslet[Token, Category]](a: A, b: B): auto =
     else:
       {.error: "output types do not match".}
   when A is Alternatives:
-    type Choices = typeof(A.choices) & B
-    Alternatives[Token, Category, Choices, Output](choices: a.choices & b)
+    type Choices = typeof(A.choices) && B
+    Alternatives[Token, Category, Choices, Output](choices: a.choices && b)
   else:
     type Choices = (A, B)
     Alternatives[Token, Category, Choices, Output](choices: (a, b))
