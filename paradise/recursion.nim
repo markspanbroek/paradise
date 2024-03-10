@@ -22,7 +22,7 @@ func define*[Token; G: Grammar[Token]](rule: Recursion, definition: G) =
       rule.last.incl(rule)
       updating = false
   rule.parseClosure = proc(automaton: Automaton[Token]) =
-    bind basics.error
+    bind basics.unsafeError
     proc assign() =
       rule.output = definition.output
     automaton.add(assign)

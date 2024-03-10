@@ -84,7 +84,7 @@ func update*(rule: Recursion, again: var bool) =
   rule.updateClosure(again)
 
 func updateClosures[Choice](alternatives: Alternatives, choice: Choice) =
-  bind basics.error
+  bind basics.unsafeError
   proc assign() =
     alternatives.output = choice.output
   proc parseChoice(automaton: Automaton[Alternatives.Token]) =
