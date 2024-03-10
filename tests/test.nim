@@ -7,6 +7,7 @@ import ./paradise/testInput
 import ./paradise/testLast
 import ./paradise/testLexerParser
 import ./paradise/testParser
+import ./paradise/testReadme
 import ./paradise/testTokenization
 import ./paradise/testTuples
 

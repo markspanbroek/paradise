@@ -20,6 +20,7 @@ func update*(grammar: Grammar) =
     grammar.update(again)
 
 func update*(symbol: Symbol, again: var bool) =
+  bind grammar.hash
   symbol.first.incl(symbol.categories)
   symbol.last.incl(symbol)
 

@@ -79,6 +79,7 @@ proc parse*(automaton: Automaton, optional: Optional) =
   automaton.parse(operand)
 
 proc parse*(automaton: Automaton, repetition: RepetitionStar) =
+  mixin category
   type Output = typeof(!repetition.output)
   let operand = repetition.operand
   let input = automaton.input
@@ -102,6 +103,7 @@ proc parse*(automaton: Automaton, repetition: RepetitionStar) =
   next()
 
 proc parse*(automaton: Automaton, repetition: RepetitionPlus) =
+  mixin category
   type Output = typeof(!repetition.output)
   let operand = repetition.operand
   let input = automaton.input
@@ -129,6 +131,7 @@ proc parse*(automaton: Automaton, rule: Recursion) =
   rule.parseClosure(automaton)
 
 proc parse*(automaton: Automaton, alternatives: Alternatives) =
+  mixin category
   type Output = typeof(!alternatives.output)
   let input = automaton.input
   without peek =? input.peek(), error:
