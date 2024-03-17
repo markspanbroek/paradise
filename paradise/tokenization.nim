@@ -30,6 +30,11 @@ func tokenize*[In](parser: Parser, input: Input[In]): auto =
       peeking.ended
     else:
       input.ended()
+  output.location = proc: Location =
+    if peeking =? peeked:
+      peeking.location
+    else:
+      input.location()
   output
 
 func tokenize*(parser: Parser, input: string): auto =

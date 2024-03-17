@@ -2,6 +2,7 @@ import std/unittest
 import std/strutils
 import pkg/questionable/results
 import paradise
+import paradise/input
 
 suite "tokenization":
 
@@ -25,6 +26,16 @@ suite "tokenization":
     check tokens.read() == success '3'
     check tokens.peek().isFailure
     check tokens.read().isFailure
+
+  test "contains location":
+    let tokens = digit.tokenize("123")
+    check $tokens.location() == "(1, 1)"
+    discard tokens.read()
+    check $tokens.location() == "(1, 2)"
+    discard tokens.peek()
+    check $tokens.location() == "(1, 2)"
+    discard tokens.read()
+    check $tokens.location() == "(1, 3)"
 
   test "errors include location":
     let tokens = digit.tokenize("1x3")
