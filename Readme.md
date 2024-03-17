@@ -10,7 +10,7 @@ Use the [Nimble][1] package manager to add `paradise` to an existing
 project. Add the following to its .nimble file:
 
 ```nim
-requires "paradise >= 0.1.0 & < 0.2.0"
+requires "paradise >= 0.1.1 & < 0.2.0"
 ```
 
 Example
