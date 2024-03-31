@@ -32,8 +32,6 @@ suite "tokenization":
     check $tokens.location() == "(1, 1)"
     discard tokens.read()
     check $tokens.location() == "(1, 2)"
-    discard tokens.peek()
-    check $tokens.location() == "(1, 2)"
     discard tokens.read()
     check $tokens.location() == "(1, 3)"
 
@@ -42,17 +40,3 @@ suite "tokenization":
     check tokens.read() == success '1'
     check tokens.peek().error.msg.contains("(1, 2)")
     check tokens.read().error.msg.contains("(1, 2)")
-
-  test "location does not change when peeking":
-    let tokens = digit.tokenize("123")
-    let before = tokens.location
-    discard tokens.peek()
-    let after = tokens.location
-    check before == after
-
-  test "ended does not change when peeking":
-    let tokens = digit.tokenize("1")
-    let before = tokens.ended()
-    discard tokens.peek()
-    let after = tokens.ended()
-    check before == after

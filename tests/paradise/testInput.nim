@@ -145,3 +145,52 @@ suite "file input":
         outcome = input.read()
       outcome.error
     check readUntilError(input).msg.contains("(1, 4)")
+
+suite "input without peek function":
+
+  var input: Input[int]
+
+  setup:
+    var count = 0
+    let finish = 3
+    proc read: ?!int =
+      result = success count
+      inc count
+    proc ended: bool =
+      count == finish
+    proc location: Location =
+      Location(line: 0, column: count)
+    input = Input.new(read = read, ended = ended, location = location)
+
+  test "reads one token at a time":
+    check input.read() == success 0
+    check input.read() == success 1
+    check input.read() == success 2
+
+  test "peeks ahead at the next token":
+    check input.peek() == success 0
+    check input.peek() == success 0
+    check input.read() == success 0
+    check input.peek() == success 1
+    check input.read() == success 1
+    check input.peek() == success 2
+    check input.read() == success 2
+
+  test "contains location":
+    check $input.location() == "(0, 0)"
+    discard input.read()
+    check $input.location() == "(0, 1)"
+    discard input.read()
+    check $input.location() == "(0, 2)"
+
+  test "location does not change when peeking":
+    let before = input.location
+    discard input.peek()
+    let after = input.location
+    check before == after
+
+  test "ended does not change when peeking":
+    let before = input.ended()
+    discard input.peek()
+    let after = input.ended()
+    check before == after

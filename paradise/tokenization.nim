@@ -3,39 +3,11 @@ import ./grammar
 import ./input
 import ./parser
 
-type Peek[Token] = object
-  next: ?!Token
-  location: Location
-  ended: bool
-
 func tokenize*[In](parser: Parser, input: Input[In]): auto =
   type Out = typeof(!parser.parse(input))
-  let output = Input[Out]()
-  var peeked: ?Peek[Out]
-  output.peek = proc: ?!Out =
-    without var peeking =? peeked:
-      peeking.location = input.location()
-      peeking.ended = input.ended()
-      peeking.next = parser.parse(input)
-      peeked = some peeking
-    peeking.next
-  output.read = proc: ?!Out =
-    if peeking =? peeked:
-      result = peeking.next
-      peeked = none Peek[Out]
-    else:
-      result = parser.parse(input)
-  output.ended = proc: bool =
-    if peeking =? peeked:
-      peeking.ended
-    else:
-      input.ended()
-  output.location = proc: Location =
-    if peeking =? peeked:
-      peeking.location
-    else:
-      input.location()
-  output
+  proc read: ?!Out =
+    parser.parse(input)
+  Input.new(read = read, ended = input.ended, location = input.location)
 
 func tokenize*(parser: Parser, input: string): auto =
   tokenize(parser, Input.new(input))
