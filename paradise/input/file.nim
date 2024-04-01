@@ -23,11 +23,11 @@ func new*(_: type Input, file: File, bufferSize: static int = 2048): Input[char]
       except IOError as error:
         failure error.msg & " " & $loc
   proc ended: bool =
-    index >= length and endOfFile(file)
+    finished
   proc read: ?!char =
     result = peek()
     if result.isSuccess:
-      if not ended():
+      if index < length or not endOfFile(file):
         if !result == '\n':
           inc loc.line
           loc.column = 1

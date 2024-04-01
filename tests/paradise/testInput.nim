@@ -18,6 +18,14 @@ suite "string input":
     check input.read() == success 'x'
     check input.read() == success '\0'
 
+  test "ends after reading zero character at end of string":
+    let input = Input.new("x")
+    check not input.ended()
+    discard input.read()
+    check not input.ended()
+    discard input.read()
+    check input.ended()
+
   test "fails when reading beyond end of string":
     let input = Input.new("")
     check input.read() == success '\0'
@@ -65,6 +73,14 @@ suite "token sequence input":
     let input = Input.new(@[token1])
     check input.read() == success token1
     check input.read() == success LexerToken.endOfInput
+
+  test "ends after reading special token at end of input":
+    let input = Input.new(@[token1])
+    check not input.ended()
+    discard input.read()
+    check not input.ended()
+    discard input.read()
+    check input.ended()
 
   test "fails when reading beyond end of input":
     let input = Input.new(@[token1])
@@ -118,6 +134,12 @@ suite "file input":
   test "reads a zero character at end of file":
     for _ in 0..<3: discard input.read()
     check input.read() == success '\0'
+
+  test "ends after reading zero character at end of file":
+    for _ in 0..<4:
+      check not input.ended()
+      discard input.read()
+    check input.ended()
 
   test "fails when reading beyond end of file":
     for _ in 0..<3: discard input.read()

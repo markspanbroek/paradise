@@ -20,7 +20,7 @@ func new*[Token](_: type Input, tokens: seq[Token]): Input[Token] =
         inc loc.column
       inc index
   proc ended: bool =
-    index >= tokens.len
+    index > tokens.len
   proc location: Location =
     loc
   Input.new(peek = peek, read = read, ended = ended, location = location)

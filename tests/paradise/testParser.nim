@@ -104,9 +104,9 @@ suite "parse characters":
     check alternatives.parse("3") == success (-1, 3)
 
   test "iterative parsing":
-    let parser = symbol({'0'..'9'}) >> charToInt
+    let parser = symbol({'0'..'9'}) | finish() >> charToInt
     let parsed = toSeq(parser.tokenize("123"))
-    check parsed == @[success 1, success 2, success 3]
+    check parsed == @[success 1, success 2, success 3, success -1]
 
   test "iterative parsing stops on error":
     let parser = symbol({'0'..'9'}) >> charToInt
@@ -224,10 +224,10 @@ suite "parse tokens":
     check alternatives.parse(@[]) == success (none LexerToken, tokenEnd)
 
   test "iterative parsing":
-    let number = symbol(LexerToken, {LexerCategory.number})
+    let number = symbol(LexerToken, {LexerCategory.number, LexerCategory.endOfInput})
     let parser = number >> tokenToString
     let parsed = toSeq(parser.tokenize(@[token1, token2]))
-    check parsed == @[success "1", success "2"]
+    check parsed == @[success "1", success "2", success "endOfInput"]
 
   test "iterative parsing stops on error":
     let number = symbol(LexerToken, {LexerCategory.number})

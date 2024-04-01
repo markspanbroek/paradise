@@ -23,7 +23,7 @@ func new*(_: type Input, characters: string): Input[char] =
           inc loc.column
       inc index
   proc ended: bool =
-    index >= characters.len
+    index > characters.len
   proc location: Location =
     loc
   Input.new(peek = peek, read = read, ended = ended, location = location)
