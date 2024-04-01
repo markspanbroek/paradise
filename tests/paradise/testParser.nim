@@ -128,23 +128,25 @@ suite "parse tokens":
 
   let token1 = LexerToken(category: number, value: "1")
   let token2 = LexerToken(category: number, value: "2")
-  let tokenA = LexerToken(category: text, value: "a")
+  let tokenT = LexerToken(category: text, value: "text")
+  let tokenN = LexerToken(category: name, value: "name")
+  let tokenEnd = LexerToken(category: endOfInput)
 
   test "symbols":
     let number = symbol(LexerToken, LexerCategory.number)
     let text = symbol(LexerToken, LexerCategory.text)
     check number.parse(@[token1]) == success token1
     check number.parse(@[token2]) == success token2
-    check number.parse(@[tokenA]).isFailure
+    check number.parse(@[tokenT]).isFailure
     check text.parse(@[token1]).isFailure
     check text.parse(@[token2]).isFailure
-    check text.parse(@[tokenA]) == success tokenA
+    check text.parse(@[tokenT]) == success tokenT
 
   test "symbol sets":
     let numberOrText = symbol(LexerToken, {LexerCategory.number, text})
     check numberOrText.parse(@[token1]) == success token1
     check numberOrText.parse(@[token2]) == success token2
-    check numberOrText.parse(@[tokenA]) == success tokenA
+    check numberOrText.parse(@[tokenT]) == success tokenT
 
   test "end of input":
     let endToken = LexerToken(category: endOfInput)
@@ -162,34 +164,34 @@ suite "parse tokens":
     let number = symbol(LexerToken, LexerCategory.number)
     let text = symbol(LexerToken, LexerCategory.text)
     let numberAndText = number & text
-    check numberAndText.parse(@[token1, tokenA]) == success (token1, tokenA)
+    check numberAndText.parse(@[token1, tokenT]) == success (token1, tokenT)
     check numberAndText.parse(@[token1, token2]).error.msg == "expected: text (0, 1)"
-    check numberAndText.parse(@[tokenA, tokenA]).error.msg == "expected: number (0, 0)"
+    check numberAndText.parse(@[tokenT, tokenT]).error.msg == "expected: number (0, 0)"
 
   test "optional":
     let number = symbol(LexerToken, LexerCategory.number)
     let text = symbol(LexerToken, LexerCategory.text)
     check (?number).parse(@[token1]) == success some token1
     check (?number).parse(@[]) == success none LexerToken
-    check (?number & text).parse(@[token1, tokenA]) == success (some token1, tokenA)
-    check (?number & text).parse(@[tokenA]) == success (none LexerToken, tokenA)
+    check (?number & text).parse(@[token1, tokenT]) == success (some token1, tokenT)
+    check (?number & text).parse(@[tokenT]) == success (none LexerToken, tokenT)
 
   test "repetition *":
     let number = symbol(LexerToken, LexerCategory.number)
     let text = symbol(LexerToken, LexerCategory.text)
     let repetition = *number & text
     let empty = seq[LexerToken].default
-    check repetition.parse(@[tokenA]) == success (empty, tokenA)
-    check repetition.parse(@[token1, tokenA]) == success (@[token1], tokenA)
-    check repetition.parse(@[token1, token2, tokenA]) == success (@[token1, token2], tokenA)
+    check repetition.parse(@[tokenT]) == success (empty, tokenT)
+    check repetition.parse(@[token1, tokenT]) == success (@[token1], tokenT)
+    check repetition.parse(@[token1, token2, tokenT]) == success (@[token1, token2], tokenT)
 
   test "repetition +":
     let number = symbol(LexerToken, LexerCategory.number)
     let text = symbol(LexerToken, LexerCategory.text)
     let repetition = +number & text
-    check repetition.parse(@[tokenA]).isFailure
-    check repetition.parse(@[token1, tokenA]) == success (@[token1], tokenA)
-    check repetition.parse(@[token1, token2, tokenA]) == success (@[token1, token2], tokenA)
+    check repetition.parse(@[tokenT]).isFailure
+    check repetition.parse(@[token1, tokenT]) == success (@[token1], tokenT)
+    check repetition.parse(@[token1, token2, tokenT]) == success (@[token1, token2], tokenT)
 
   test "recursive rules":
     let numbers = recursive(LexerToken, int)
@@ -201,6 +203,26 @@ suite "parse tokens":
     check numbers.parse(@[token1, token2]) == success 2
     check numbers.parse(@[token1, token2, token1]) == success 3
 
+  test "alternatives":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let finish = symbol(LexerToken, LexerCategory.endOfInput)
+    let alternatives = number | finish
+    check alternatives.parse(@[token1]) == success token1
+    check alternatives.parse(@[token2]) == success token2
+    check alternatives.parse(@[]) == success tokenEnd
+    check alternatives.parse(@[tokenT]).isFailure
+
+  test "optional alternatives":
+    let number = symbol(LexerToken, LexerCategory.number)
+    let text = symbol(LexerToken, LexerCategory.text)
+    let name = symbol(LexerToken, LexerCategory.name)
+    let finish = symbol(LexerToken, LexerCategory.endOfInput)
+    let alternatives = (?number & name) | (?text & finish)
+    check alternatives.parse(@[token1, tokenN]) == success (some token1, tokenN)
+    check alternatives.parse(@[tokenT]) == success (some tokenT, tokenEnd)
+    check alternatives.parse(@[tokenN]) == success (none LexerToken, tokenN)
+    check alternatives.parse(@[]) == success (none LexerToken, tokenEnd)
+
   test "iterative parsing":
     let number = symbol(LexerToken, {LexerCategory.number})
     let parser = number >> tokenToString
@@ -210,14 +232,14 @@ suite "parse tokens":
   test "iterative parsing stops on error":
     let number = symbol(LexerToken, {LexerCategory.number})
     let parser = number >> tokenToString
-    let parsed = toSeq(parser.tokenize(@[token1, tokenA, token2]))
+    let parsed = toSeq(parser.tokenize(@[token1, tokenT, token2]))
     check parsed.len == 2
     check parsed[0] == success "1"
     check parsed[1].isFailure
 
   test "errors include sequence index":
     let grammar = symbol(LexerToken, LexerCategory.number)
-    let input = Input.new(@[token1, token2, tokenA])
+    let input = Input.new(@[token1, token2, tokenT])
     for _ in 1..2: # read up to "a"
       discard input.read()
     let error = grammar.parse(input).error

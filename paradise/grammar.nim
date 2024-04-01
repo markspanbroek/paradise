@@ -69,9 +69,9 @@ func `&`*[Token, Category; Left, Right: Parslet[Token, Category]](left: Left, ri
     type Output = typeof((!left.output, !right.output))
   Concatenation[Token, Category, Left, Right, Output](left: left, right: right)
 
-type Alternatives*[Token, Category, Choices, Output] = ref object of Parslet[Token, Category]
+type Alternatives*[Token, Category, Choices, Output; CategorySize: static int] = ref object of Parslet[Token, Category]
   choices*: Choices
-  parseClosures*: array[Category.high, proc(automaton: Automaton[Token])]
+  parseClosures*: array[CategorySize, proc(automaton: Automaton[Token])]
   output*: ?!Output
 
 func `$`*(alternatives: Alternatives): string =
@@ -93,12 +93,13 @@ func `|`*[Token, Category; A, B: Parslet[Token, Category]](a: A, b: B): auto =
       type Output = typeof(!a.output)
     else:
       {.error: "output types do not match".}
+  const CategorySize = Category.high.int + 1
   when A is Alternatives:
     type Choices = typeof(A.choices) && B
-    Alternatives[Token, Category, Choices, Output](choices: a.choices && b)
+    Alternatives[Token, Category, Choices, Output, CategorySize](choices: a.choices && b)
   else:
     type Choices = (A, B)
-    Alternatives[Token, Category, Choices, Output](choices: (a, b))
+    Alternatives[Token, Category, Choices, Output, CategorySize](choices: (a, b))
 
 type Optional*[Token, Category, Operand, Output] = ref object of Parslet[Token, Category]
   operand*: Operand
