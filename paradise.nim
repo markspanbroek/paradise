@@ -13,6 +13,9 @@ export grammar.`|`
 import paradise/recursion
 export recursion.define
 
+import paradise/rules
+export rules.rule
+
 import paradise/parser
 export parser.parser
 export parser.parse

@@ -114,6 +114,10 @@ suite "examples from readme":
     # match "x", "xx", "xxx", etc, but not the empty string
     let oneOrMore = +symbol('x')
 
+  test "rules":
+    rule digit: symbol({'0'..'9'})
+    rule letter: symbol({'a'..'z'})
+
   test "recursion":
     # declare recursive rule, which after successful parsing returns an `int`
     let parentheses = recursive int

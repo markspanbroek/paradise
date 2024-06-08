@@ -188,6 +188,18 @@ Returns a `seq` when parsing succeeds. For the examples above you would expect a
 sequence of type `seq[char]`. Sequences of characters however are special and
 are returned as `string` instead.
 
+#### Rules ####
+
+Grammar rules capture an expression and give it a name:
+
+```nim
+rule digit: symbol({'0'..'9'})
+rule letter: symbol({'a'..'z'})
+```
+
+Giving expressions a name makes it easier to see what's wrong when a parse
+fails, because the name is used in the error message.
+
 #### Recursion ####
 
 Recursive rules need to be declared first, and can then be defined later.

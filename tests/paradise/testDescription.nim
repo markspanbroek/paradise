@@ -1,6 +1,7 @@
 import std/unittest
 import std/strutils
 import paradise/grammar
+import paradise/rules
 import ./examples/lexer
 import ./examples/conversion
 
@@ -43,6 +44,12 @@ suite "grammar descriptions":
   test "repetition +":
     check $(+symbol('a')) == "'a'+"
     check $(+(symbol('x') & symbol('!'))) == "('x' & '!')+"
+
+  test "rule":
+    rule foo: symbol('a')
+    rule bar: symbol('b')
+    check $foo == "foo"
+    check $bar == "bar"
 
   test "recursive rule with name":
     check $recursive("foo", int) == "foo"
