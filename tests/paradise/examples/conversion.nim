@@ -1,3 +1,4 @@
+import paradise/input
 import ./lexer
 
 proc charToInt*(character: char): int =
@@ -12,3 +13,9 @@ proc tokenToString*(token: LexerToken): string =
     token.value
   else:
     $token.category
+
+proc charLocation*(character: char, location: Location): string =
+  $location
+
+proc tokenLocation*(token: LexerToken, location: Location): string =
+  $location

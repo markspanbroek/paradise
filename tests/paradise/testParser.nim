@@ -29,6 +29,11 @@ suite "parse characters":
     check (symbol({'0'..'9'}) >> charToInt).parse("5") == success 5
     check (symbol({'0'..'9'}) >> charToInt).parse("a").isFailure
 
+  test "conversion with access to location":
+    let digitLocations = +(symbol({'0'..'9'}) >> charLocation)
+    check digitLocations.parse("42") == success @["(1, 1)", "(1, 2)"]
+    check digitLocations.parse("a").isFailure
+
   test "concatenation":
     let ab = symbol('a') & symbol('b')
     check ab.parse("ab") == success ('a', 'b')
@@ -159,6 +164,11 @@ suite "parse tokens":
     let token123 = LexerToken(category: number, value: "123")
     check text.parse(@[tokenAbc]) == success "abc"
     check text.parse(@[token123]).isFailure
+
+  test "conversion with access to location":
+    let numberLocations = +(symbol(LexerToken, LexerCategory.number) >> tokenLocation)
+    check numberLocations.parse(@[token1, token2]) == success @["(0, 0)", "(0, 1)"]
+    check numberLocations.parse(@[tokenT]).isFailure
 
   test "concatenation":
     let number = symbol(LexerToken, LexerCategory.number)

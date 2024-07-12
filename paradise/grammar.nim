@@ -2,6 +2,7 @@ import ./basics
 import ./characters
 import ./tuples
 import ./automaton
+import ./input
 
 type Grammar*[Token] = ref object of RootObj
 
@@ -46,13 +47,28 @@ type
     operand*: Operand
     convert*: Converter[From, To]
     output*: ?!To
-  Converter[From, To] = proc(input: From): To {.noSideEffect.}
+  Converter[From, To] = proc(value: From): To {.noSideEffect.}
 
 func `$`*(conversion: Conversion): string =
   $conversion.operand
 
 func `>>`*[Token, Category; Operand: Parslet[Token, Category], From, To](operand: Operand, convert: Converter[From, To]): auto =
   Conversion[Token, Category, Operand, From, To](operand: operand, convert: convert)
+
+type
+  ConversionWithLocation*[Token, Category, Operand, From, To] = ref object of Parslet[Token, Category]
+    operand*: Operand
+    convert*: ConverterWithLocation[From, To]
+    output*: ?!To
+  ConverterWithLocation[From, To] = proc(value: From, location: Location): To {.noSideEffect.}
+
+func `$`*(conversion: ConversionWithLocation): string =
+  $conversion.operand
+
+func `>>`*[Token, Category; Operand: Parslet[Token, Category], From, To](operand: Operand, convert: ConverterWithLocation[From, To]): auto =
+  ConversionWithLocation[Token, Category, Operand, From, To](operand: operand, convert: convert)
+
+type AnyConversion* = Conversion | ConversionWithLocation
 
 type Concatenation*[Token, Category, Left, Right, Output] = ref object of Parslet[Token, Category]
   left*: Left

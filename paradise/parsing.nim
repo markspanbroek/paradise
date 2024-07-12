@@ -7,6 +7,7 @@ import ./automaton
 
 proc parse*(automaton: Automaton, symbol: Symbol)
 proc parse*(automaton: Automaton, conversion: Conversion)
+proc parse*(automaton: Automaton, conversion: ConversionWithLocation)
 proc parse*[C: Concatenation](automaton: Automaton, concatenation: C)
 proc parse*(automaton: Automaton, optional: Optional)
 proc parse*(automaton: Automaton, repetition: RepetitionStar)
@@ -37,6 +38,17 @@ proc parse*(automaton: Automaton, symbol: Symbol) =
 proc parse*(automaton: Automaton, conversion: Conversion) =
   proc assign() =
     conversion.output = conversion.operand.output.map(conversion.convert)
+  automaton.add(assign)
+  automaton.parse(conversion.operand)
+
+proc parse*(automaton: Automaton, conversion: ConversionWithLocation) =
+  type Output = typeof(!conversion.output)
+  let location = automaton.input.location()
+  proc assign() =
+    without value =? conversion.operand.output, error:
+      conversion.output = Output.failure error
+      return
+    conversion.output = success conversion.convert(value, location)
   automaton.add(assign)
   automaton.parse(conversion.operand)
 

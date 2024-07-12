@@ -4,7 +4,7 @@ import ./parsing
 import ./automaton
 
 func update*(symbol: Symbol, again: var bool)
-func update*(conversion: Conversion, again: var bool)
+func update*(conversion: AnyConversion, again: var bool)
 func update*(concatenation: Concatenation, again: var bool)
 func update*(optional: Optional, again: var bool)
 func update*(repetition: RepetitionStar, again: var bool)
@@ -24,7 +24,7 @@ func update*(symbol: Symbol, again: var bool) =
   symbol.first.incl(symbol.categories)
   symbol.last.incl(symbol)
 
-func update*(conversion: Conversion, again: var bool) =
+func update*(conversion: AnyConversion, again: var bool) =
   bind basics.items
   let operand = conversion.operand
   operand.update()
