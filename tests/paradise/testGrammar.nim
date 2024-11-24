@@ -52,7 +52,8 @@ suite "token grammars":
     check text is Grammar[LexerToken]
 
   test "token sets":
-    check symbol(LexerToken, {LexerCategory.number, text}) is Grammar[LexerToken]
+    check symbol(LexerToken, {LexerCategory.number, LexerCategory.text}) is 
+      Grammar[LexerToken]
 
   test "end of input":
     check finish(LexerToken) is Grammar[LexerToken]

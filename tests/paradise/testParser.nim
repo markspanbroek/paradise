@@ -135,7 +135,7 @@ suite "parse tokens":
   let token2 = LexerToken(category: number, value: "2")
   let tokenT = LexerToken(category: text, value: "text")
   let tokenN = LexerToken(category: name, value: "name")
-  let tokenEnd = LexerToken(category: endOfInput)
+  let tokenEnd = LexerToken(category: LexerCategory.endOfInput)
 
   test "symbols":
     let number = symbol(LexerToken, LexerCategory.number)
@@ -154,14 +154,14 @@ suite "parse tokens":
     check numberOrText.parse(@[tokenT]) == success tokenT
 
   test "end of input":
-    let endToken = LexerToken(category: endOfInput)
+    let endToken = LexerToken(category: LexerCategory.endOfInput)
     check finish(LexerToken).parse(@[]) == success endToken
     check finish(LexerToken).parse(@[token1]).isFailure
 
   test "conversion":
     let text = symbol(LexerToken, LexerCategory.text) >> tokenToString
-    let tokenAbc = LexerToken(category: text, value: "abc")
-    let token123 = LexerToken(category: number, value: "123")
+    let tokenAbc = LexerToken(category: LexerCategory.text, value: "abc")
+    let token123 = LexerToken(category: LexerCategory.number, value: "123")
     check text.parse(@[tokenAbc]) == success "abc"
     check text.parse(@[token123]).isFailure
 
