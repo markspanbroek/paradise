@@ -6,11 +6,11 @@ import ./LL1
 type Parser*[G] = object
   grammar: G
 
-func parser*(grammar: Grammar): auto =
+func parser*[Token; G: Grammar[Token]](grammar: G): auto =
   grammar.update()
   Parser[typeof(grammar)](grammar: grammar)
 
-proc parse*(parser: Parser, input: Input): auto =
+proc parse*[Token; G: Grammar[Token]](parser: Parser[G], input: Input): auto =
   parser.grammar.parse(input)
 
 proc parse*[G: Grammar[char]](parser: Parser[G], input: string): auto =
@@ -22,5 +22,5 @@ proc parse*[Token; G: Grammar[Token]](parser: Parser[G], input: seq[Token]): aut
 proc parse*[G: Grammar[char]](parser: Parser[G], input: File): auto =
   parser.parse(Input.new(input))
 
-template parse*(grammar: Grammar, input: untyped): auto =
+template parse*[Token; G: Grammar[Token]](grammar: G, input: untyped): auto =
   grammar.parser.parse(input)

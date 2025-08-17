@@ -5,7 +5,7 @@ import paradise/grammar
 import paradise/LL1
 import paradise/recursion
 
-proc last(grammar: Grammar): auto =
+proc last[Token; G: Grammar[Token]](grammar: G): auto =
   update(grammar)
   grammar.last
 

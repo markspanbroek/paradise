@@ -7,7 +7,7 @@ import ./examples/conversion
 
 suite "empty":
 
-  proc canBeEmpty(grammar: Grammar): bool =
+  proc canBeEmpty[Token; G:Grammar[Token]](grammar: G): bool =
     grammar.update()
     grammar.canBeEmpty
 

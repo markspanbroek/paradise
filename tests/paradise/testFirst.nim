@@ -6,7 +6,7 @@ import paradise/recursion
 import ./examples/conversion
 import ./examples/lexer
 
-proc first(grammar: Grammar): auto =
+proc first[Token; G: Grammar[Token]](grammar: G): auto =
   grammar.update()
   grammar.first
 

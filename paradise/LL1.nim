@@ -12,7 +12,7 @@ func update*(repetition: RepetitionPlus, again: var bool)
 func update*(rule: Recursion, again: var bool)
 func update*(alternatives: Alternatives, again: var bool)
 
-func update*(grammar: Grammar) =
+func update*[Token; G: Grammar[Token]](grammar: G) =
   var again = false
   grammar.update(again)
   while again:

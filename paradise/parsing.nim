@@ -15,7 +15,7 @@ proc parse*(automaton: Automaton, repetition: RepetitionPlus)
 proc parse*(automaton: Automaton, rule: Recursion)
 proc parse*(automaton: Automaton, alternatives: Alternatives)
 
-proc parse*(grammar: Grammar, input: Input): auto =
+proc parse*[Token; G: Grammar[Token]](grammar: G, input: Input): auto =
   var automaton = Automaton.new(input)
   automaton.parse(grammar)
   automaton.run()
