@@ -1,4 +1,4 @@
-version = "0.3.4"
+version = "0.3.5"
 license = "MIT"
 description = "Parsing framework"
 author = "Mark Spanbroek"
