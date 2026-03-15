@@ -10,5 +10,6 @@ import ./paradise/testParser
 import ./paradise/testReadme
 import ./paradise/testTokenization
 import ./paradise/testTuples
+import ./paradise/testPerformance
 
 {.warning[UnusedImport]:off.}

@@ -5,23 +5,22 @@ import ./automaton
 import ./parsing
 
 func define*[Token; G: Grammar[Token]](rule: Recursion, definition: G) =
-  var updating = false
   var recursive = false
-  rule.updateClosure = proc(again: var bool) =
-    if not updating:
-      updating = true
-      definition.update()
+  var latestRound = 0
+  rule.updateClosure = proc(round: int, again: var bool) =
+    if round > latestRound :
+      latestRound = round
+      definition.update(round, again)
       if not rule.canBeEmpty and definition.canBeEmpty:
         rule.canBeEmpty = definition.canBeEmpty
-        again = recursive
+        again = again or recursive
       if not (definition.first <= rule.first):
         rule.first.incl(definition.first)
-        again = recursive
+        again = again or recursive
       if not (definition.last <= rule.last):
         rule.last.incl(definition.last)
-        again = recursive
+        again = again or recursive
       rule.last.incl(rule)
-      updating = false
     else:
       recursive = true
   rule.parseClosure = proc(automaton: Automaton[Token]) =

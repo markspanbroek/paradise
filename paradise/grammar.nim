@@ -157,7 +157,7 @@ func `+`*[Token, Category; Operand: Parslet[Token, Category]](operand: Operand):
   RepetitionPlus[Token, Category, Operand, Output](operand: operand)
 
 type Recursion*[Token, Category, Output] = ref object of Parslet[Token, Category]
-  updateClosure*: proc(again: var bool) {.noSideEffect.}
+  updateClosure*: proc(round: int, again: var bool) {.noSideEffect.}
   parseClosure*: proc(automaton: Automaton[Token])
   description: string
   output*: ?!Output
