@@ -97,7 +97,8 @@ func updateClosures[Choice](alternatives: Alternatives, choice: Choice) =
   if choice.canBeEmpty:
     categories.incl(choice.follow)
   for category in categories:
-    alternatives.parseClosures[category.int] = parseChoice
+    if alternatives.parseClosures[category.int] == nil:
+      alternatives.parseClosures[category.int] = parseChoice
 
 func update*(alternatives: Alternatives, round: int, again: var bool) =
   for choice in alternatives.choices.fields:

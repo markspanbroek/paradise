@@ -108,6 +108,12 @@ suite "parse characters":
     check alternatives.parse("23") == success (2, 3)
     check alternatives.parse("3") == success (-1, 3)
 
+  test "chooses first alternative that matches":
+    proc one(c: char): int = 1
+    proc two(c: char): int = 2
+    let alternatives = (symbol('x') >> one)| (symbol('x') >> two)
+    check alternatives.parse("x") == success 1
+
   test "iterative parsing":
     let parser = symbol({'0'..'9'}) | finish() >> charToInt
     let parsed = toSeq(parser.tokenize("123"))
